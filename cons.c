@@ -244,6 +244,7 @@ void init_constants()
 	PERF_AVG_TRIALS = atoi(getvalue("PERF_AVG_TRIALS"));
 	XCSF_X0 = atof(getvalue("XCSF_X0"));
 	XCSF_ETA = atof(getvalue("XCSF_ETA"));
+	XCSF_EXPONENT = atoi(getvalue("XCSF_EXPONENT"));
 	muEPS_0 = atof(getvalue("muEPS_0"));
 	NUM_MU = atoi(getvalue("NUM_MU"));
 	tidyup();  

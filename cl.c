@@ -40,8 +40,8 @@ void init_cl(CL *c, int size, int time)
 	c->size = size;
 	c->time = time;
 #ifdef XCSF
-	c->weights = malloc(sizeof(double)*(pred_length+1));
-	for(int i = 0; i < pred_length+1; i++)
+	c->weights = malloc(sizeof(double)*((pred_length*XCSF_EXPONENT)+1));
+	for(int i = 0; i < (pred_length*XCSF_EXPONENT)+1; i++)
 		c->weights[i] = 0.0;
 #else
 	c->pre = INIT_PREDICTION;
@@ -64,7 +64,7 @@ void copy_cl(CL *to, CL *from)
 	memcpy(to->con, from->con, sizeof(char)*state_length);
 	to->act = from->act;
 #ifdef XCSF
-	memcpy(to->weights, from->weights, sizeof(double)*(pred_length+1));
+	memcpy(to->weights, from->weights, sizeof(double)*((pred_length*XCSF_EXPONENT)+1));
 #endif
 #ifdef SELF_ADAPT_MUTATION
 	memcpy(to->mu, from->mu, sizeof(double)*NUM_MU);
@@ -239,18 +239,20 @@ void update_pre(CL *c, double p, double *state)
 		norm += state[i] * state[i];
 	double correction = (XCSF_ETA * error) / norm;
 	c->weights[0] += XCSF_X0 * correction;
-	for(int i = 1; i < pred_length+1; i++)
-		c->weights[i] += correction * state[i-1];
+	for(int i = 0; i < pred_length*XCSF_EXPONENT; i+=XCSF_EXPONENT)
+		for(int j = 0; j < XCSF_EXPONENT; j++)
+			c->weights[i+j+1] += correction * pow(state[i/XCSF_EXPONENT], j+1);
 }
 
 double compute_pre(CL *c, double *state)
 {
 	double pre = XCSF_X0 * c->weights[0];
-	for(int i = 0; i < pred_length; i++)
-		pre += state[i] * c->weights[i+1];
+	for(int i = 0; i < pred_length*XCSF_EXPONENT; i+=XCSF_EXPONENT)
+		for(int j = 0; j < XCSF_EXPONENT; j++)
+			pre += pow(state[i/XCSF_EXPONENT], j+1) * c->weights[i+j+1];
 	return pre;
-}
-
+} 
+ 
 double update_err(CL *c, double p, double *state)
 {
 	double pre = compute_pre(c, state);
@@ -260,7 +262,7 @@ double update_err(CL *c, double p, double *state)
 		c->err += BETA * (fabs(p - pre) - c->err);
 	return c->err * c->num;
 }
-
+ 
 #else
 double update_pre(CL *c, double p)
 {
@@ -326,7 +328,7 @@ void print_cl(CL *c)
 	printf(" %d %f %f %d %d %f %d\n",
 			c->act, c->err, c->fit, c->num, c->exp, c->size, c->time);
 	printf("weights: ");
-	for(int i = 0; i < pred_length+1; i++)
+	for(int i = 0; i < (pred_length*XCSF_EXPONENT)+1; i++)
 		printf("%f, ", c->weights[i]);
 	printf("\n");
 }
