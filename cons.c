@@ -55,7 +55,7 @@ pchar getvalue(pchar name);
 psection head;
 psection current;
  
-void constants_init()
+void constants_init(int argc, char **argv)
 {
 	init_config("cons.txt");
 	POP_SIZE = atoi(getvalue("POP_SIZE"));
@@ -93,7 +93,13 @@ void constants_init()
 	XCSF_ETA = atof(getvalue("XCSF_ETA"));
 	muEPS_0 = atof(getvalue("muEPS_0"));
 	NUM_MU = atoi(getvalue("NUM_MU"));
-	tidyup();  
+	tidyup();
+	// override cons.txt with command line arguments
+	if(argc > 3) {
+		MAX_TRIALS = atoi(argv[3]);
+		if(argc > 4)
+			NUM_EXPERIMENTS = atoi(argv[4]);
+	}      
 }
 
 void trim(pchar s) // Remove tabs/spaces/lf/cr  both ends

@@ -21,12 +21,13 @@ typedef struct NODE
 	struct NODE *next;
 } NODE;
  
+void pop_init();
+void pop_add(CL *c);
 NODE *pop_del();
 double set_mean_time(NODE **set, int num_sum);
 double set_total_fit(NODE **set);
 double set_total_time(NODE **set);
 int set_action(NODE **mset, NODE **aset, int action, int *num);
-void pop_add(CL *c);
 void set_add(NODE **set, CL *c);
 void set_clean(NODE **kset, NODE **set, _Bool in_set);
 void set_free(NODE **set);

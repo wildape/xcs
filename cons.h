@@ -14,7 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-void constants_init();
+
+void constants_init(int argc, char **argv);
 
 // values are read from cons.txt
 int POP_SIZE;

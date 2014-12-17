@@ -38,7 +38,14 @@ void set_update_fit(NODE **set, int size, int num_sum);
 
 double *pa;
 double *nr;
-
+ 
+void pop_init()
+{
+	pset = NULL; // population linked list
+	pop_num = 0; // num macro-classifiers
+	pop_num_sum = 0; // numerosity sum
+}
+ 
 void set_match(NODE **mset, char *state, int time, NODE **kset)
 {
 	int m_num = 0;
