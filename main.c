@@ -27,16 +27,14 @@
 #include "cl_set.h"
 #include "ga.h"
 #include "env.h"
+#include "perf.h"
 
-void single_step_exp(int *perf, double *err);
-void explore_single(int time);
-void exploit_single(int time, int *correct, double *error);
-void multi_step_exp(int *perf, double *err);
 int explore_multi(int step);
 void exploit_multi(int *perf, double *err, int trial, int step);
-void disp_perf(int *performance, double *error, int expl_p);
-
-FILE *fout;
+void exploit_single(int time, int *correct, double *error);
+void explore_single(int time);
+void multi_step_exp(int *perf, double *err);
+void single_step_exp(int *perf, double *err);
 
 int main(int argc, char *argv[0])
 {    
@@ -44,15 +42,8 @@ int main(int argc, char *argv[0])
 		printf("Usage: xcs problemType(mp,maze) problem{size|maze} [MaxTrials] [NumExp]\n");
 		exit(EXIT_FAILURE);
 	} 
-	// file for writing output; uses the date/time/exp as file name
-	time_t t = time(NULL);
-	struct tm tm = *localtime(&t);
-	char basefname[30];
-	char fname[30];
-	sprintf(basefname, "dat/%04d-%02d-%02d-%02d%02d%02d", tm.tm_year + 1900, 
-			tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-  	
 	// initialise constants
+	gen_outfname();
 	constants_init();
 	if(argc > 3) {
 		MAX_TRIALS = atoi(argv[3]);
@@ -64,16 +55,10 @@ int main(int argc, char *argv[0])
 	// initialise environment
 	random_init();
 	env_init(argv);
+
 	// start experiments
 	for(int i = 1; i < NUM_EXPERIMENTS+1; i++) {
-		// new output file
-		sprintf(fname, "%s-%d.dat", basefname, i);
-		fout = fopen(fname, "wt");
-		if(fout == 0) {
-			printf("Error opening file: %s. %s.\n", fname, strerror(errno));
-			exit(EXIT_FAILURE);
-		} 
-
+		outfile_init(i);
 		printf("\nExperiment: %d\n", i);
 		pset = NULL; // population linked list
 		pop_num = 0; // num macro-classifiers
@@ -83,7 +68,7 @@ int main(int argc, char *argv[0])
 		else
 			multi_step_exp(perf, err);
 		set_kill(&pset);
-		fclose(fout);
+		outfile_close();
 	}
 	return EXIT_SUCCESS;
 }
@@ -314,28 +299,4 @@ void exploit_multi(int *perf, double *err, int trial, int step)
 	set_free(&prev_aset);
 	perf[trial%PERF_AVG_TRIALS] = steps;
 	err[trial%PERF_AVG_TRIALS] /= steps;
-}
-
-void disp_perf(int *performance, double *error, int expl_p)
-{
-	double perf = 0.0;
-	double serr = 0.0;
-	for(int i = 0; i < PERF_AVG_TRIALS; i++) {
-		perf += performance[i];
-		serr += error[i];
-	}
-	perf /= (double)PERF_AVG_TRIALS;
-	serr /= (double)PERF_AVG_TRIALS;
-	printf("%d %.2f %.5f %d", expl_p, perf, serr, pop_num);
-	fprintf(fout, "%d %.2f %.5f %d", expl_p, perf, serr, pop_num);
-#ifdef SELF_ADAPT_MUTATION
-	for(int i = 0; i < NUM_MU; i++) {
-		printf(" %.5f", set_avg_mut(&pset, i));
-		fprintf(fout, " %.5f", set_avg_mut(&pset, i));
-	}
-#endif
-	printf("\n");
-	fprintf(fout, "\n");
-	fflush(stdout);
-	fflush(fout);
 }
