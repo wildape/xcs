@@ -44,6 +44,15 @@ double pred_update(CL *c, double p)
 	return c->pre * c->num;
 }
 
+double pred_update_err(CL *c, double p)
+{
+	if(c->exp < 1.0/BETA)
+		c->err = (c->err * (c->exp-1.0) + fabs(p - c->pre)) / (double)c->exp;
+	else
+		c->err += BETA * (fabs(p - c->pre) - c->err);
+	return c->err * c->num;
+}     
+
 void pred_print(CL *c)
 {
 	printf("prediction: %f\n", c->pre);

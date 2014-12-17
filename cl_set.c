@@ -197,10 +197,10 @@ void set_update(NODE **set, int *size, int *num,
 		CL *c = iter->cl;
 		c->exp++;
 #ifdef XCSF
-		cl_update_err(c, p, state);
+		pred_update_err(c, p, state);
 		pred_update(c, p, state);
 #else
-		cl_update_err(c, p);
+		pred_update_err(c, p);
 		pred_update(c, p);
 #endif
 		cl_update_size(c, *num);

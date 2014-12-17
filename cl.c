@@ -116,29 +116,6 @@ double cl_del_vote(CL *c, double avg_fit)
 	return c->size * c->num * avg_fit / (c->fit / c->num); 
 }
 
- 
-#ifdef XCSF
-double cl_update_err(CL *c, double p, double *state)
-{
-	double pre = pred_compute(c, state);
-	if(c->exp < 1.0/BETA) 
-		c->err = (c->err * (c->exp-1.0) + fabs(p - pre)) / (double)c->exp;
-	else
-		c->err += BETA * (fabs(p - pre) - c->err);
-	return c->err * c->num;
-}
- 
-#else
-double cl_update_err(CL *c, double p)
-{
-	if(c->exp < 1.0/BETA)
-		c->err = (c->err * (c->exp-1.0) + fabs(p - c->pre)) / (double)c->exp;
-	else
-		c->err += BETA * (fabs(p - c->pre) - c->err);
-	return c->err * c->num;
-}
-#endif
-
 double cl_acc(CL *c)
 {
 	if(c->err <= EPS_0)

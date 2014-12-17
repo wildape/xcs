@@ -58,7 +58,17 @@ void pred_free(CL *c)
 {
 	free(c->weights);
 }
-
+ 
+double pred_update_err(CL *c, double p, double *state)
+{
+	double pre = pred_compute(c, state);
+	if(c->exp < 1.0/BETA) 
+		c->err = (c->err * (c->exp-1.0) + fabs(p - pre)) / (double)c->exp;
+	else
+		c->err += BETA * (fabs(p - pre) - c->err);
+	return c->err * c->num;
+}
+ 
 void pred_update(CL *c, double p, double *state)
 {
 	// pre has been updated for the current state during set_pred()
