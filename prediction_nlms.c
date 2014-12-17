@@ -59,9 +59,10 @@ void pred_free(CL *c)
 	free(c->weights);
 }
  
-double pred_update_err(CL *c, double p, double *state)
+double pred_update_err(CL *c, double p)
 {
-	double pre = pred_compute(c, state);
+	// pre has been updated for the current state during pa_init()
+	double pre = c->pre; //pred_compute(c, state);
 	if(c->exp < 1.0/BETA) 
 		c->err = (c->err * (c->exp-1.0) + fabs(p - pre)) / (double)c->exp;
 	else
@@ -71,7 +72,7 @@ double pred_update_err(CL *c, double p, double *state)
  
 void pred_update(CL *c, double p, double *state)
 {
-	// pre has been updated for the current state during set_pred()
+	// pre has been updated for the current state during pa_init()
 	double error = p - c->pre; //pred_compute(c, state);
 	double norm = XCSF_X0 * XCSF_X0;
 	for(int i = 0; i < pred_length; i++)
@@ -115,7 +116,7 @@ double pred_compute(CL *c, double *state)
 
 void pred_print(CL *c)
 {
-	printf("weights: ");
+	printf("nlms prediction weights: ");
 	for(int i = 0; i < c->weights_length; i++)
 		printf("%f, ", c->weights[i]);
 	printf("\n");
