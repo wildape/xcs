@@ -237,7 +237,7 @@ void set_subsumption(NODE **set, int *size, int *num, NODE **kset)
 	for(iter = *set; iter != NULL; iter = iter->next) {
 		CL *c = iter->cl;
 		if(cl_subsumer(c)) {
-			if(s == NULL || cl_general(c, s))
+			if(s == NULL || cond_general(c, s))
 				s = c;
 		}
 	}
@@ -246,7 +246,7 @@ void set_subsumption(NODE **set, int *size, int *num, NODE **kset)
 		iter = *set; 
 		while(iter != NULL) {
 			CL *c = iter->cl;
-			if(cl_general(s, c)) {
+			if(cond_general(s, c)) {
 				s->num += c->num;
 				c->num = 0;
 				set_add(kset, c);

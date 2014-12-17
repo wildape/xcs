@@ -130,6 +130,27 @@ _Bool cond_mutate(CL *c, char *state)
 	return mod;
 }
 
+_Bool cond_general(CL *c1, CL *c2)
+{
+	// returns true if c1 is more general than c2
+	_Bool gen = false;
+	for(int i = 0; i < state_length; i++) {
+		if(c1->con[i] != DONT_CARE && c1->con[i] != c2->con[i])
+			return false;
+		else if(c1->con[i] != c2->con[i])
+			gen = true;
+	}
+	return gen;
+}
+ 
+_Bool cond_duplicate(CL *c1, CL *c2)
+{
+	if(strcmp(c1->con, c2->con) == 0)
+		return true;
+	else
+		return false;
+}
+
 void cond_free(CL *c)
 {
 	free(c->con);

@@ -52,6 +52,14 @@ void act_rand(CL *c)
 {
 	c->act = irand(0, num_actions);
 }
+
+_Bool act_duplicate(CL *c1, CL *c2)
+{
+	if(c1->act == c2->act)
+		return true;
+	else
+		return false;
+}
              
 _Bool act_mutate(CL *c)
 {

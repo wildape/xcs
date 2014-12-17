@@ -74,7 +74,7 @@ _Bool mutate(CL *c, char *state)
 
 _Bool cl_duplicate(CL *c1, CL *c2)
 {
-	if(strcmp(c1->con, c2->con) == 0 && c1->act == c2->act)
+	if(cond_duplicate(c1,c2) && act_duplicate(c1,c2))
 		return true;
 	else
 		return false;
@@ -82,8 +82,8 @@ _Bool cl_duplicate(CL *c1, CL *c2)
 
 _Bool cl_subsumes(CL *c1, CL *c2)
 {
-	if(c1->act == c2->act && c1->exp > THETA_SUB && c1->err < EPS_0)
-		if(cl_general(c1, c2))
+	if(act_duplicate(c1,c2) && c1->exp > THETA_SUB && c1->err < EPS_0)
+		if(cond_general(c1,c2))
 			return true;
 	return false;
 }
@@ -94,19 +94,6 @@ _Bool cl_subsumer(CL *c)
 		return true;
 	else
 		return false;
-}
-
-_Bool cl_general(CL *c1, CL *c2)
-{
-	// returns true if c1 is more general than c2
-	_Bool gen = false;
-	for(int i = 0; i < state_length; i++) {
-		if(c1->con[i] != DONT_CARE && c1->con[i] != c2->con[i])
-			return false;
-		else if(c1->con[i] != c2->con[i])
-			gen = true;
-	}
-	return gen;
 }
 
 double cl_del_vote(CL *c, double avg_fit)
