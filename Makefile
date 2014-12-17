@@ -17,7 +17,7 @@
 CC=gcc
 
 FLAGS=
-CFLAGS=$(FLAGS) -Wall -Wextra -std=c11 -pipe -g
+CFLAGS=$(FLAGS) -Wall -Wextra -std=gnu11 -pipe -g
 LDFLAGS=$(FLAGS)
 LIB=-lm
  
@@ -29,6 +29,8 @@ SAM=0
 
 ifeq ($(XCSF),1)
 	CFLAGS+= -DXCSF
+else ifeq ($(XCSF),2)
+	CFLAGS+= -DXCSF -DQUADRATIC
 endif
 ifeq ($(SAM),1)
 	CFLAGS+= -DSELF_ADAPT_MUTATION

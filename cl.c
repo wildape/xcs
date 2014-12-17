@@ -39,13 +39,7 @@ void init_cl(CL *c, int size, int time)
 	c->exp = 0;
 	c->size = size;
 	c->time = time;
-#ifdef XCSF
-	c->weights = malloc(sizeof(double)*((pred_length*XCSF_EXPONENT)+1));
-	for(int i = 0; i < (pred_length*XCSF_EXPONENT)+1; i++)
-		c->weights[i] = 0.0;
-#else
-	c->pre = INIT_PREDICTION;
-#endif
+	pred_init(c);
 #ifdef SELF_ADAPT_MUTATION
 	c->mu = malloc(sizeof(double)*NUM_MU);
 	c->iset = malloc(sizeof(int)*NUM_MU);
@@ -63,9 +57,7 @@ void copy_cl(CL *to, CL *from)
 	init_cl(to, from->size, from->time);
 	memcpy(to->con, from->con, sizeof(char)*state_length);
 	to->act = from->act;
-#ifdef XCSF
-	memcpy(to->weights, from->weights, sizeof(double)*((pred_length*XCSF_EXPONENT)+1));
-#endif
+	pred_copy(to, from);
 #ifdef SELF_ADAPT_MUTATION
 	memcpy(to->mu, from->mu, sizeof(double)*NUM_MU);
 	memcpy(to->gset, from->gset, sizeof(double)*NUM_MU);
@@ -230,32 +222,11 @@ double del_vote(CL *c, double avg_fit)
 	return c->size * c->num * avg_fit / (c->fit / c->num); 
 }
 
-#ifdef XCSF
-void update_pre(CL *c, double p, double *state)
-{
-	double error = p - compute_pre(c, state);
-	double norm = XCSF_X0 * XCSF_X0;
-	for(int i = 0; i < pred_length; i++)
-		norm += state[i] * state[i];
-	double correction = (XCSF_ETA * error) / norm;
-	c->weights[0] += XCSF_X0 * correction;
-	for(int i = 0; i < pred_length*XCSF_EXPONENT; i+=XCSF_EXPONENT)
-		for(int j = 0; j < XCSF_EXPONENT; j++)
-			c->weights[i+j+1] += correction * pow(state[i/XCSF_EXPONENT], j+1);
-}
-
-double compute_pre(CL *c, double *state)
-{
-	double pre = XCSF_X0 * c->weights[0];
-	for(int i = 0; i < pred_length*XCSF_EXPONENT; i+=XCSF_EXPONENT)
-		for(int j = 0; j < XCSF_EXPONENT; j++)
-			pre += pow(state[i/XCSF_EXPONENT], j+1) * c->weights[i+j+1];
-	return pre;
-} 
  
+#ifdef XCSF
 double update_err(CL *c, double p, double *state)
 {
-	double pre = compute_pre(c, state);
+	double pre = pred_compute(c, state);
 	if(c->exp < 1.0/BETA) 
 		c->err = (c->err * (c->exp-1.0) + fabs(p - pre)) / (double)c->exp;
 	else
@@ -264,16 +235,6 @@ double update_err(CL *c, double p, double *state)
 }
  
 #else
-double update_pre(CL *c, double p)
-{
-	if(c->exp < 1.0/BETA) 
-		c->pre = (c->pre * (c->exp-1.0) + p) / (double)c->exp;
-	else
-		c->pre += BETA * (p - c->pre);
-
-	return c->pre * c->num;
-}
-
 double update_err(CL *c, double p)
 {
 	if(c->exp < 1.0/BETA)
@@ -309,9 +270,7 @@ double update_size(CL *c, double num_sum)
 void free_cl(CL *c)
 {
 	free(c->con);
-#ifdef XCSF
-	free(c->weights);
-#endif
+	pred_free(c);
 #ifdef SELF_ADAPT_MUTATION
 	free(c->mu);
 	free(c->iset);
@@ -320,27 +279,14 @@ void free_cl(CL *c)
 	free(c);
 }
 
-#ifdef XCSF
 void print_cl(CL *c)
 {
 	for(int i = 0; i < state_length; i++)
 		printf("%c", c->con[i]);
-	printf(" %d %f %f %d %d %f %d\n",
+	printf("%d %f %f %d %d %f %d\n",
 			c->act, c->err, c->fit, c->num, c->exp, c->size, c->time);
-	printf("weights: ");
-	for(int i = 0; i < (pred_length*XCSF_EXPONENT)+1; i++)
-		printf("%f, ", c->weights[i]);
-	printf("\n");
+	pred_print(c);
 }
-#else
-void print_cl(CL *c)
-{
-	for(int i = 0; i < state_length; i++)
-		printf("%c", c->con[i]);
-	printf(" %d %f %f %f %d %d %f %d\n",
-			c->act, c->pre, c->err, c->fit, c->num, c->exp, c->size, c->time);
-}
-#endif
 
 #ifdef SELF_ADAPT_MUTATION
 void adapt_mut(CL *c)

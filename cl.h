@@ -24,10 +24,10 @@ typedef struct CL
 	int exp;
 	double size;
 	int time;
+	double pre;
 #ifdef XCSF
 	double *weights;
-#else
-	double pre;
+	int weights_length;
 #endif
 #ifdef SELF_ADAPT_MUTATION
 	double *mu;
@@ -55,10 +55,14 @@ _Bool subsumes(CL *c1, CL *c2);
 void free_cl(CL *c);
 void print_cl(CL *c);
 #ifdef XCSF
-void update_pre(CL *c, double p, double *state);
-double compute_pre(CL *c, double *state);
+void pred_update(CL *c, double p, double *state);
+double pred_compute(CL *c, double *state);
 double update_err(CL *c, double p, double *state);
 #else
-double update_pre(CL *c, double p);
+double pred_update(CL *c, double p);
 double update_err(CL *c, double p);
 #endif
+void pred_init(CL *c);
+void pred_free(CL *c);
+void pred_copy(CL *to, CL *from);
+void pred_print(CL *c);

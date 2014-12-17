@@ -283,10 +283,10 @@ void update_set(NODE **set, int *size, int *num,
 		c->exp++;
 #ifdef XCSF
 		update_err(c, p, state);
-		update_pre(c, p, state);
+		pred_update(c, p, state);
 #else
 		update_err(c, p);
-		update_pre(c, p);
+		pred_update(c, p);
 #endif
 		update_size(c, *num);
 	}
@@ -391,7 +391,7 @@ void init_pa(NODE **set)
 	for(NODE *iter = *set; iter != NULL; iter = iter->next) {
 		CL *c = iter->cl;
 #ifdef XCSF
-		pa[c->act] += compute_pre(c, state) * c->fit;
+		pa[c->act] += pred_compute(c, state) * c->fit;
 #else
 		pa[c->act] += c->pre * c->fit;
 #endif
