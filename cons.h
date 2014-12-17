@@ -45,7 +45,6 @@ int PERF_AVG_TRIALS;
 // xcsf computed pred
 double XCSF_X0;
 double XCSF_ETA;
-int XCSF_EXPONENT; // 1 = linear prediction, 2 = quadratic, etc.
 // self-adaptive mutation
 double muEPS_0;
 int NUM_MU;
