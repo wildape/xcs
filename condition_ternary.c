@@ -35,8 +35,6 @@
 #include "random.h"
 #include "cl.h"
 
-_Bool mutate_con(CL *c, char *state);
-
 void cond_init(CL *c)
 {
 	c->con = malloc(sizeof(char)*state_length);

@@ -34,7 +34,7 @@
 int main(int argc, char *argv[0])
 {    
 	if(argc < 3 || argc > 5) {
-		printf("Usage: xcs problemType(mp,maze) problem{size|maze} [MaxTrials] [NumExp]\n");
+		printf("Usage: xcs problemType{mp|maze} problem{size|maze} [MaxTrials] [NumExp]\n");
 		exit(EXIT_FAILURE);
 	} 
 
