@@ -18,6 +18,9 @@
  * Description: 
  **************
  * Classifier integer actions module.
+ *
+ * Represents a classifier's executable action as an integer. Provides
+ * functions to generate random actions and to mutate an action, etc.
  */
 
 #include <stdio.h>
