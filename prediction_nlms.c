@@ -71,7 +71,7 @@ double pred_update_err(CL *c, double p, double *state)
  
 void pred_update(CL *c, double p, double *state)
 {
-	// pre has been updated for the current state during set_pred()
+	// pre has been updated for the current state during pred_update_err()
 	double error = p - c->pre; //pred_compute(c, state);
 	double norm = XCSF_X0 * XCSF_X0;
 	for(int i = 0; i < pred_length; i++)
