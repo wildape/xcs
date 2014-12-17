@@ -329,8 +329,8 @@ void disp_perf(int *performance, double *error, int expl_p)
 	fprintf(fout, "%d %.2f %.5f %d", expl_p, perf, serr, pop_num);
 #ifdef SELF_ADAPT_MUTATION
 	for(int i = 0; i < NUM_MU; i++) {
-		printf(" %.5f", avg_mut(&pset, i));
-		fprintf(fout, " %.5f", avg_mut(&pset, i));
+		printf(" %.5f", set_avg_mut(&pset, i));
+		fprintf(fout, " %.5f", set_avg_mut(&pset, i));
 	}
 #endif
 	printf("\n");

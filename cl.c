@@ -25,10 +25,6 @@
 
 _Bool mutate_act(CL *c);
 _Bool mutate_con(CL *c, char *state);
-#ifdef SELF_ADAPT_MUTATION
-void adapt_mut(CL *c);
-double gasdev(CL *c, int m);
-#endif
 
 void init_cl(CL *c, int size, int time)
 {
@@ -41,14 +37,7 @@ void init_cl(CL *c, int size, int time)
 	c->time = time;
 	pred_init(c);
 #ifdef SELF_ADAPT_MUTATION
-	c->mu = malloc(sizeof(double)*NUM_MU);
-	c->iset = malloc(sizeof(int)*NUM_MU);
-	c->gset = malloc(sizeof(double)*NUM_MU);
-	for(int i = 0; i < NUM_MU; i++) {
-		c->mu[i] = drand();
-		c->iset[i] = 0;
-		c->gset[i] = 0.0;
-	}
+	sam_init(c);
 #endif
 }
 
@@ -59,9 +48,7 @@ void copy_cl(CL *to, CL *from)
 	to->act = from->act;
 	pred_copy(to, from);
 #ifdef SELF_ADAPT_MUTATION
-	memcpy(to->mu, from->mu, sizeof(double)*NUM_MU);
-	memcpy(to->gset, from->gset, sizeof(double)*NUM_MU);
-	memcpy(to->iset, from->iset, sizeof(int)*NUM_MU);
+	sam_copy(to, from);
 #endif
 }
 
@@ -140,7 +127,7 @@ _Bool two_pt_cross(CL *c1, CL *c2)
 _Bool mutate(CL *c, char *state)
 {
 #ifdef SELF_ADAPT_MUTATION
-	adapt_mut(c);
+	sam_adapt(c);
 	P_MUTATION = c->mu[0];
 #endif
 	_Bool mod = mutate_con(c, state);
@@ -272,9 +259,7 @@ void free_cl(CL *c)
 	free(c->con);
 	pred_free(c);
 #ifdef SELF_ADAPT_MUTATION
-	free(c->mu);
-	free(c->iset);
-	free(c->gset);
+	sam_free(c);
 #endif
 	free(c);
 }
@@ -287,38 +272,3 @@ void print_cl(CL *c)
 			c->act, c->err, c->fit, c->num, c->exp, c->size, c->time);
 	pred_print(c);
 }
-
-#ifdef SELF_ADAPT_MUTATION
-void adapt_mut(CL *c)
-{
-	for(int i = 0; i < NUM_MU; i++) {
-		c->mu[i] *= exp(gasdev(c,i));
-		if(c->mu[i] < muEPS_0)
-			c->mu[i] = muEPS_0;
-		else if(c->mu[i] > 1.0)
-			c->mu[i] = 1.0;
-	}
-}
-
-double gasdev(CL *c, int m)
-{
-	// from numerical recipes in c
-	double fac, rsq, v1, v2;
-	if(c->iset[m] == 0) {
-		do {
-			v1 = (drand()*2.0)-1.0;
-			v2 = (drand()*2.0)-1.0;
-			rsq = (v1*v1)+(v2*v2);
-		}
-		while(rsq >= 1.0 || rsq == 0.0);
-		fac = sqrt(-2.0*log(rsq)/rsq);
-		c->gset[m] = v1*fac;
-		c->iset[m] = 1;
-		return v2*fac;
-	}
-	else {
-		c->iset[m] = 0;
-		return c->gset[m];
-	}
-}
-#endif

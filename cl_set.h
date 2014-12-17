@@ -42,7 +42,7 @@ void update_set(NODE **set, int *size, int *num, double max_p, double r,
 void init_pa(NODE **set);
 #endif
 #ifdef SELF_ADAPT_MUTATION
-double avg_mut(NODE **set, int m);
+double set_avg_mut(NODE **set, int m);
 #endif
 
 NODE *pset;

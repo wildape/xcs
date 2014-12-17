@@ -525,7 +525,7 @@ void clean_set(NODE **kset, NODE **set, _Bool in_set)
 }
 
 #ifdef SELF_ADAPT_MUTATION
-double avg_mut(NODE **set, int m)
+double set_avg_mut(NODE **set, int m)
 {
 	double sum = 0.0;
 	int cnt = 0;

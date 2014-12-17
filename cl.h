@@ -36,24 +36,29 @@ typedef struct CL
 #endif
 } CL;
 
+// general classifier
 void init_cl(CL *c, int size, int time);
 void copy_cl(CL *to, CL *from);
+void free_cl(CL *c);
+void print_cl(CL *c);
+double del_vote(CL *c, double avg_fit);
+double acc(CL *c);
+void update_fit(CL *c, double acc_sum, double acc);
+double update_size(CL *c, double num_sum);
+_Bool subsumer(CL *c);
+
+// classifier condition and action
 void rand_cond(CL *c);
 void match_con(CL *c, char *mcon);
 void rand_act(CL *c);
 _Bool match(CL *c, char *state);
 _Bool two_pt_cross(CL *c1, CL *c2);
 _Bool mutate(CL *c, char *state);
-double del_vote(CL *c, double avg_fit);
-double acc(CL *c);
-void update_fit(CL *c, double acc_sum, double acc);
-double update_size(CL *c, double num_sum);
 _Bool duplicate(CL *c1, CL *c2);
 _Bool general(CL *c1, CL *c2);
-_Bool subsumer(CL *c);
 _Bool subsumes(CL *c1, CL *c2);
-void free_cl(CL *c);
-void print_cl(CL *c);
+
+// classifier prediction
 #ifdef XCSF
 void pred_update(CL *c, double p, double *state);
 double pred_compute(CL *c, double *state);
@@ -66,3 +71,9 @@ void pred_init(CL *c);
 void pred_free(CL *c);
 void pred_copy(CL *to, CL *from);
 void pred_print(CL *c);
+
+// self-adaptive mutation
+void sam_init(CL *c);
+void sam_free(CL *c);
+void sam_copy(CL *to, CL *from);
+void sam_adapt(CL *c);       
