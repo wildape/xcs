@@ -17,9 +17,14 @@
  **************
  * Description: 
  **************
- * Classifier ternary conditions module.
+ * Classifier ternary [0,1,#] conditions module.
+ *
+ * A classifier matches for a binary environment state if, and only if, all
+ * bits in the environment string match the condition with the exception of the
+ * DONT_CARE symbol, which matches a logical '1' or '0' for that bit.  Provides
+ * functions to generate random or matching conditions, to mutate a condition,
+ * and print it, etc.
  */
-
 
 #include <stdio.h>
 #include <stdlib.h>
