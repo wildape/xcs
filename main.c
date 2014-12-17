@@ -53,7 +53,7 @@ int main(int argc, char *argv[0])
 			tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
   	
 	// initialise constants
-	init_constants();
+	constants_init();
 	if(argc > 3) {
 		MAX_TRIALS = atoi(argv[3]);
 		if(argc > 4)
@@ -62,8 +62,8 @@ int main(int argc, char *argv[0])
 	int perf[PERF_AVG_TRIALS];
 	double err[PERF_AVG_TRIALS];
 	// initialise environment
-	init_random();
-	init_env(argv);
+	random_init();
+	env_init(argv);
 	// start experiments
 	for(int i = 1; i < NUM_EXPERIMENTS+1; i++) {
 		// new output file
@@ -104,11 +104,11 @@ void single_step_exp(int *perf, double *err)
  
 void explore_single(int time)
 {
-	char *state = get_state();
+	char *state = env_get_state();
 	NODE *mset = NULL, *kset = NULL;
 	set_match(&mset, state, time, &kset);
 #ifdef XCSF
-	double *dstate = get_dstate();
+	double *dstate = env_get_dstate();
 	pa_init(&mset, dstate);
 #else
 	pa_init(&mset);
@@ -116,7 +116,7 @@ void explore_single(int time)
 	int action = pa_rand_action();
 	NODE *aset = NULL; int anum = 0;
 	int asize = set_action(&mset, &aset, action, &anum);
-	double reward = execute_action(action);
+	double reward = env_exec_action(action);
 #ifdef XCSF
 	set_update(&aset, &asize, &anum, 0.0, reward, &kset, dstate);
 #else
@@ -130,11 +130,11 @@ void explore_single(int time)
 
 void exploit_single(int time, int *correct, double *error)
 {
-	char *state = get_state();
+	char *state = env_get_state();
 	NODE *mset = NULL, *kset = NULL;
 	set_match(&mset, state, time, &kset);
 #ifdef XCSF
-	double *dstate = get_dstate();
+	double *dstate = env_get_dstate();
 	pa_init(&mset, dstate);
 #else
 	pa_init(&mset);
@@ -142,7 +142,7 @@ void exploit_single(int time, int *correct, double *error)
 	int action = pa_best_action();
 	NODE *aset = NULL; int anum = 0;
 	set_action(&mset, &aset, action, &anum);
-	double reward = execute_action(action);
+	double reward = env_exec_action(action);
 	if(reward > 0)
 		correct[time%PERF_AVG_TRIALS] = 1;
 	else
@@ -182,9 +182,9 @@ int explore_multi(int step)
 
 	for(steps = 0; steps < TELETRANSPORTATION && !reset; steps++) {
 		// percieve environment
-		char *state = get_state();
+		char *state = env_get_state();
 #ifdef XCSF
-		double *dstate = get_dstate();
+		double *dstate = env_get_dstate();
 #endif
 		// generate match set
 		NODE *mset = NULL;
@@ -200,8 +200,8 @@ int explore_multi(int step)
 		NODE *aset = NULL; int anum = 0;
 		int asize = set_action(&mset, &aset, action, &anum);
 		// get environment feedback
-		double reward = execute_action(action);
-		reset = is_reset();
+		double reward = env_exec_action(action);
+		reset = env_is_reset();
 		// update previous action set and run GA
 		if(prev_aset != NULL) {
 			set_validate(&prev_aset, &prev_asize, &prev_anum);
@@ -254,9 +254,9 @@ void exploit_multi(int *perf, double *err, int trial, int step)
 
 	for(steps = 0; steps < TELETRANSPORTATION && !reset; steps++) {
 		// percieve environment
-		char *state = get_state();
+		char *state = env_get_state();
 #ifdef XCSF
-		double *dstate = get_dstate();
+		double *dstate = env_get_dstate();
 #endif
 		// generate match set
 		NODE *mset = NULL;
@@ -273,8 +273,8 @@ void exploit_multi(int *perf, double *err, int trial, int step)
 		NODE *aset = NULL;
 		int asize = set_action(&mset, &aset, action, &anum);
 		// get environment feedback
-		double reward = execute_action(action);
-		reset = is_reset();
+		double reward = env_exec_action(action);
+		reset = env_is_reset();
 		// update previous action set
 		if(prev_aset != NULL) {
 			set_validate(&prev_aset, &prev_asize, &prev_anum);

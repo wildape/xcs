@@ -13,7 +13,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **************
+ * Description: 
+ **************
+ * The constants module.
+ *
+ * Reads in the global constants from cons.txt. The number of trials and number
+ * of experiments to perform can be overridden by passing command line
+ * arguments.
  */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -44,6 +54,48 @@ pchar getvalue(pchar name);
 
 psection head;
 psection current;
+ 
+void constants_init()
+{
+	init_config("cons.txt");
+	POP_SIZE = atoi(getvalue("POP_SIZE"));
+	NUM_EXPERIMENTS = atoi(getvalue("NUM_EXPERIMENTS"));
+	MAX_TRIALS = atoi(getvalue("MAX_TRIALS"));
+	P_CROSSOVER = atof(getvalue("P_CROSSOVER"));
+	P_MUTATION = atof(getvalue("P_MUTATION"));
+	THETA_SUB = atof(getvalue("THETA_SUB"));
+	EPS_0 = atof(getvalue("EPS_0"));
+	DELTA = atof(getvalue("DELTA"));
+	THETA_DEL = atof(getvalue("THETA_DEL"));
+	THETA_GA = atof(getvalue("THETA_GA"));
+	BETA = atof(getvalue("BETA"));
+	ALPHA = atof(getvalue("ALPHA")); 
+	NU = atof(getvalue("NU"));
+	GAMMA = atof(getvalue("GAMMA"));
+	P_DONTCARE = atof(getvalue("P_DONTCARE"));
+	DONT_CARE = '#';
+	INIT_PREDICTION = atof(getvalue("INIT_PREDICTION"));
+	INIT_FITNESS = atof(getvalue("INIT_FITNESS"));
+	INIT_ERROR = atof(getvalue("INIT_ERROR"));
+	ERR_REDUC = atof(getvalue("ERR_REDUC"));
+	FIT_REDUC = atof(getvalue("FIT_REDUC"));
+	TELETRANSPORTATION = atoi(getvalue("TELETRANSPORTATION"));
+	if(strcmp(getvalue("GA_SUBSUMPTION"), "false") == 0)
+		GA_SUBSUMPTION = false;
+	else
+		GA_SUBSUMPTION = true;
+	if(strcmp(getvalue("ACTION_SUBSUMPTION"), "false") == 0)
+		ACTION_SUBSUMPTION = false;
+	else
+		ACTION_SUBSUMPTION = true;
+	PERF_AVG_TRIALS = atoi(getvalue("PERF_AVG_TRIALS"));
+	XCSF_X0 = atof(getvalue("XCSF_X0"));
+	XCSF_ETA = atof(getvalue("XCSF_ETA"));
+	XCSF_EXPONENT = atoi(getvalue("XCSF_EXPONENT"));
+	muEPS_0 = atof(getvalue("muEPS_0"));
+	NUM_MU = atoi(getvalue("NUM_MU"));
+	tidyup();  
+}
 
 void trim(pchar s) // Remove tabs/spaces/lf/cr  both ends
 {
@@ -208,44 +260,3 @@ void tidyup()
 	head=NULL;
 }
 
-void init_constants()
-{
-	init_config("cons.txt");
-	POP_SIZE = atoi(getvalue("POP_SIZE"));
-	NUM_EXPERIMENTS = atoi(getvalue("NUM_EXPERIMENTS"));
-	MAX_TRIALS = atoi(getvalue("MAX_TRIALS"));
-	P_CROSSOVER = atof(getvalue("P_CROSSOVER"));
-	P_MUTATION = atof(getvalue("P_MUTATION"));
-	THETA_SUB = atof(getvalue("THETA_SUB"));
-	EPS_0 = atof(getvalue("EPS_0"));
-	DELTA = atof(getvalue("DELTA"));
-	THETA_DEL = atof(getvalue("THETA_DEL"));
-	THETA_GA = atof(getvalue("THETA_GA"));
-	BETA = atof(getvalue("BETA"));
-	ALPHA = atof(getvalue("ALPHA")); 
-	NU = atof(getvalue("NU"));
-	GAMMA = atof(getvalue("GAMMA"));
-	P_DONTCARE = atof(getvalue("P_DONTCARE"));
-	DONT_CARE = '#';
-	INIT_PREDICTION = atof(getvalue("INIT_PREDICTION"));
-	INIT_FITNESS = atof(getvalue("INIT_FITNESS"));
-	INIT_ERROR = atof(getvalue("INIT_ERROR"));
-	ERR_REDUC = atof(getvalue("ERR_REDUC"));
-	FIT_REDUC = atof(getvalue("FIT_REDUC"));
-	TELETRANSPORTATION = atoi(getvalue("TELETRANSPORTATION"));
-	if(strcmp(getvalue("GA_SUBSUMPTION"), "false") == 0)
-		GA_SUBSUMPTION = false;
-	else
-		GA_SUBSUMPTION = true;
-	if(strcmp(getvalue("ACTION_SUBSUMPTION"), "false") == 0)
-		ACTION_SUBSUMPTION = false;
-	else
-		ACTION_SUBSUMPTION = true;
-	PERF_AVG_TRIALS = atoi(getvalue("PERF_AVG_TRIALS"));
-	XCSF_X0 = atof(getvalue("XCSF_X0"));
-	XCSF_ETA = atof(getvalue("XCSF_ETA"));
-	XCSF_EXPONENT = atoi(getvalue("XCSF_EXPONENT"));
-	muEPS_0 = atof(getvalue("muEPS_0"));
-	NUM_MU = atoi(getvalue("NUM_MU"));
-	tidyup();  
-}

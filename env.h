@@ -1,8 +1,8 @@
-void init_env(char **argv);
-double execute_action(int action);
-char *get_state();
-_Bool is_reset();
+void env_init(char **argv);
+double env_exec_action(int action);
+char *env_get_state();
+_Bool env_is_reset();
 void env_reset();
 #ifdef XCSF
-double *get_dstate();
+double *env_get_dstate();
 #endif

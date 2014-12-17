@@ -13,7 +13,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **************
+ * Description: 
+ **************
+ * The problem environment module.
+ *
+ * Initialises the problem environment and provides abstracted functions to
+ * perceive the environment state and to execute actions and receive reward.
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +37,7 @@ int env;
 #define MUX 0
 #define MAZE 1
 
-void init_env(char **argv)
+void env_init(char **argv)
 {
 	if(strcmp(argv[1], "mp") == 0) {
 		env = MUX;
@@ -59,7 +68,7 @@ void env_reset()
 	}
 }
 
-double execute_action(int action)
+double env_exec_action(int action)
 {
 	switch(env) {
 		case MUX:
@@ -70,7 +79,7 @@ double execute_action(int action)
 	exit(EXIT_FAILURE);
 }
 
-char *get_state()
+char *env_get_state()
 {
 	switch(env) {
 		case MUX:
@@ -82,7 +91,7 @@ char *get_state()
 }
 
 #ifdef XCSF
-double *get_dstate()
+double *env_get_dstate()
 {
 	switch(env) {
 		case MUX:
@@ -94,7 +103,7 @@ double *get_dstate()
 }
 #endif
 
-_Bool is_reset()
+_Bool env_is_reset()
 {
 	switch(env) {
 		case MUX:

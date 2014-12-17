@@ -13,13 +13,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **************
+ * Description: 
+ **************
+ * The random number generator interface module.
+ *
+ * Initialises the Mersenne Twister random number generator and provides
+ * abstracted functions for calculating a random floating point or integer. 
  */
+
 #include <time.h>
 #include <limits.h>
 #include "mt64.h"
 #include "random.h"
 
-void init_random()
+void random_init()
 {
 	time_t now = time (0);
 	unsigned char *p = (unsigned char *)&now;
