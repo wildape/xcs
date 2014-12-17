@@ -13,7 +13,37 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **************
+ * Description: 
+ **************
+ * The discrete maze problem environment module.
+ *
+ * Reads in the chosen maze from a file where each entry specifies a distinct
+ * position in the maze. The maze is toroidal and if the animat reaches one
+ * edge it can reenter the maze from the other side. Obstacles are coded as 'O'
+ * and 'Q', empty positions as '*', and food as 'F' or 'G'. A 2 bit or 3 bit
+ * encoding is automatically chosen depending on the number of perceptions. 8
+ * movements are possible to adjacent cells (if not blocked.) The animat is
+ * initially placed at a random empty position. The goal is to find the
+ * shortest path to the food. 
+ *
+ * Some mazes require a form of memory to be solved optimally.
+ * The optimal average number of steps for each maze is:
+ *
+ * Woods 1: 1.7
+ * Woods 2: 1.7
+ * Woods 14: 9.5
+ * Maze 4: 3.5
+ * Maze 5: 4.61
+ * Maze 6: 5.19
+ * Maze 7: 4.33
+ * Maze 10: 5.11
+ * Woods 101: 2.9
+ * Woods 101 1/2: 3.1
+ * Woods 102: 3.23
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -13,7 +13,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **************
+ * Description: 
+ **************
+ * The binary multiplexer problem environment module.
+ *
+ * Generates random binary strings of length k+pow(2,k) where the first k bits
+ * determine the position of the output bit in the last pow(2,k) bits.  E.g.,
+ * for a 3-bit problem, the first bit addresses which of the following 2 bits
+ * are the output.
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
