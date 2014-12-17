@@ -37,15 +37,15 @@ typedef struct CL
 } CL;
 
 // general classifier
-void init_cl(CL *c, int size, int time);
-void copy_cl(CL *to, CL *from);
-void free_cl(CL *c);
-void print_cl(CL *c);
-double del_vote(CL *c, double avg_fit);
-double acc(CL *c);
-void update_fit(CL *c, double acc_sum, double acc);
-double update_size(CL *c, double num_sum);
-_Bool subsumer(CL *c);
+void cl_init(CL *c, int size, int time);
+void cl_copy(CL *to, CL *from);
+void cl_free(CL *c);
+void cl_print(CL *c);
+double cl_del_vote(CL *c, double avg_fit);
+double cl_acc(CL *c);
+void cl_update_fit(CL *c, double acc_sum, double acc);
+double cl_update_size(CL *c, double num_sum);
+_Bool cl_subsumer(CL *c);
 
 // classifier condition and action
 void rand_cond(CL *c);
@@ -54,18 +54,18 @@ void rand_act(CL *c);
 _Bool match(CL *c, char *state);
 _Bool two_pt_cross(CL *c1, CL *c2);
 _Bool mutate(CL *c, char *state);
-_Bool duplicate(CL *c1, CL *c2);
-_Bool general(CL *c1, CL *c2);
-_Bool subsumes(CL *c1, CL *c2);
+_Bool cl_duplicate(CL *c1, CL *c2);
+_Bool cl_general(CL *c1, CL *c2);
+_Bool cl_subsumes(CL *c1, CL *c2);
 
 // classifier prediction
 #ifdef XCSF
 void pred_update(CL *c, double p, double *state);
 double pred_compute(CL *c, double *state);
-double update_err(CL *c, double p, double *state);
+double cl_update_err(CL *c, double p, double *state);
 #else
 double pred_update(CL *c, double p);
-double update_err(CL *c, double p);
+double cl_update_err(CL *c, double p);
 #endif
 void pred_init(CL *c);
 void pred_free(CL *c);

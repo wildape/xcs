@@ -26,7 +26,7 @@
 _Bool mutate_act(CL *c);
 _Bool mutate_con(CL *c, char *state);
 
-void init_cl(CL *c, int size, int time)
+void cl_init(CL *c, int size, int time)
 {
 	c->con = malloc(sizeof(char)*state_length);
 	c->fit = INIT_FITNESS;
@@ -41,9 +41,9 @@ void init_cl(CL *c, int size, int time)
 #endif
 }
 
-void copy_cl(CL *to, CL *from)
+void cl_copy(CL *to, CL *from)
 {
-	init_cl(to, from->size, from->time);
+	cl_init(to, from->size, from->time);
 	memcpy(to->con, from->con, sizeof(char)*state_length);
 	to->act = from->act;
 	pred_copy(to, from);
@@ -165,7 +165,7 @@ _Bool mutate_con(CL *c, char *state)
 	return mod;
 }
 
-_Bool duplicate(CL *c1, CL *c2)
+_Bool cl_duplicate(CL *c1, CL *c2)
 {
 	if(strcmp(c1->con, c2->con) == 0 && c1->act == c2->act)
 		return true;
@@ -173,15 +173,15 @@ _Bool duplicate(CL *c1, CL *c2)
 		return false;
 }
 
-_Bool subsumes(CL *c1, CL *c2)
+_Bool cl_subsumes(CL *c1, CL *c2)
 {
 	if(c1->act == c2->act && c1->exp > THETA_SUB && c1->err < EPS_0)
-		if (general(c1, c2))
+		if(cl_general(c1, c2))
 			return true;
 	return false;
 }
 
-_Bool subsumer(CL *c)
+_Bool cl_subsumer(CL *c)
 {
 	if(c->exp > THETA_SUB && c->err < EPS_0)
 		return true;
@@ -189,7 +189,7 @@ _Bool subsumer(CL *c)
 		return false;
 }
 
-_Bool general(CL *c1, CL *c2)
+_Bool cl_general(CL *c1, CL *c2)
 {
 	// returns true if c1 is more general than c2
 	_Bool gen = false;
@@ -202,7 +202,7 @@ _Bool general(CL *c1, CL *c2)
 	return gen;
 }
 
-double del_vote(CL *c, double avg_fit)
+double cl_del_vote(CL *c, double avg_fit)
 {
 	if(c->fit / c->num >= DELTA * avg_fit || c->exp < THETA_DEL)
 		return c->size * c->num;
@@ -211,7 +211,7 @@ double del_vote(CL *c, double avg_fit)
 
  
 #ifdef XCSF
-double update_err(CL *c, double p, double *state)
+double cl_update_err(CL *c, double p, double *state)
 {
 	double pre = pred_compute(c, state);
 	if(c->exp < 1.0/BETA) 
@@ -222,7 +222,7 @@ double update_err(CL *c, double p, double *state)
 }
  
 #else
-double update_err(CL *c, double p)
+double cl_update_err(CL *c, double p)
 {
 	if(c->exp < 1.0/BETA)
 		c->err = (c->err * (c->exp-1.0) + fabs(p - c->pre)) / (double)c->exp;
@@ -232,7 +232,7 @@ double update_err(CL *c, double p)
 }
 #endif
 
-double acc(CL *c)
+double cl_acc(CL *c)
 {
 	if(c->err <= EPS_0)
 		return 1.0;
@@ -240,12 +240,12 @@ double acc(CL *c)
 		return ALPHA * pow(c->err / EPS_0, -NU);
 }
 
-void update_fit(CL *c, double acc_sum, double acc)
+void cl_update_fit(CL *c, double acc_sum, double acc)
 {
 	c->fit += BETA * ((acc * c->num) / acc_sum - c->fit);
 }
 
-double update_size(CL *c, double num_sum)
+double cl_update_size(CL *c, double num_sum)
 {
 	if(c->exp < 1.0/BETA)
 		c->size = (c->size * (c->exp-1.0) + num_sum) / (double)c->exp; 
@@ -254,7 +254,7 @@ double update_size(CL *c, double num_sum)
 	return c->size * c->num;
 }
 
-void free_cl(CL *c)
+void cl_free(CL *c)
 {
 	free(c->con);
 	pred_free(c);
@@ -264,7 +264,7 @@ void free_cl(CL *c)
 	free(c);
 }
 
-void print_cl(CL *c)
+void cl_print(CL *c)
 {
 	for(int i = 0; i < state_length; i++)
 		printf("%c", c->con[i]);

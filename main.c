@@ -25,6 +25,7 @@
 #include "random.h"
 #include "cl.h"
 #include "cl_set.h"
+#include "ga.h"
 #include "env.h"
 
 void single_step_exp(int *perf, double *err);
@@ -81,7 +82,7 @@ int main(int argc, char *argv[0])
 			single_step_exp(perf, err);
 		else
 			multi_step_exp(perf, err);
-		kill_set(&pset);
+		set_kill(&pset);
 		fclose(fout);
 	}
 	return EXIT_SUCCESS;
@@ -105,51 +106,51 @@ void explore_single(int time)
 {
 	char *state = get_state();
 	NODE *mset = NULL, *kset = NULL;
-	match_set(&mset, state, time, &kset);
+	set_match(&mset, state, time, &kset);
 #ifdef XCSF
 	double *dstate = get_dstate();
-	init_pa(&mset, dstate);
+	pa_init(&mset, dstate);
 #else
-	init_pa(&mset);
+	pa_init(&mset);
 #endif
 	int action = pa_rand_action();
 	NODE *aset = NULL; int anum = 0;
-	int asize = action_set(&mset, &aset, action, &anum);
+	int asize = set_action(&mset, &aset, action, &anum);
 	double reward = execute_action(action);
 #ifdef XCSF
-	update_set(&aset, &asize, &anum, 0.0, reward, &kset, dstate);
+	set_update(&aset, &asize, &anum, 0.0, reward, &kset, dstate);
 #else
-	update_set(&aset, &asize, &anum, 0.0, reward, &kset);
+	set_update(&aset, &asize, &anum, 0.0, reward, &kset);
 #endif
 	ga(&aset, asize, anum, time, state, &kset);
-	free_set(&aset);
-	clean_set(&kset, &mset, true);
-	free_set(&mset);
+	set_free(&aset);
+	set_clean(&kset, &mset, true);
+	set_free(&mset);
 }
 
 void exploit_single(int time, int *correct, double *error)
 {
 	char *state = get_state();
 	NODE *mset = NULL, *kset = NULL;
-	match_set(&mset, state, time, &kset);
+	set_match(&mset, state, time, &kset);
 #ifdef XCSF
 	double *dstate = get_dstate();
-	init_pa(&mset, dstate);
+	pa_init(&mset, dstate);
 #else
-	init_pa(&mset);
+	pa_init(&mset);
 #endif
 	int action = pa_best_action();
 	NODE *aset = NULL; int anum = 0;
-	action_set(&mset, &aset, action, &anum);
+	set_action(&mset, &aset, action, &anum);
 	double reward = execute_action(action);
 	if(reward > 0)
 		correct[time%PERF_AVG_TRIALS] = 1;
 	else
 		correct[time%PERF_AVG_TRIALS] = 0;
 	error[time%PERF_AVG_TRIALS] = fabs(reward - pa_best_val());
-	free_set(&aset);
-	clean_set(&kset, &mset, true);
-	free_set(&mset);
+	set_free(&aset);
+	set_clean(&kset, &mset, true);
+	set_free(&mset);
 }
  
 void multi_step_exp(int *perf, double *err)
@@ -187,17 +188,17 @@ int explore_multi(int step)
 #endif
 		// generate match set
 		NODE *mset = NULL;
-		match_set(&mset, state, step+steps, &kset);
+		set_match(&mset, state, step+steps, &kset);
 		// select a random move
 #ifdef XCSF
-		init_pa(&mset, dstate);
+		pa_init(&mset, dstate);
 #else
-		init_pa(&mset);
+		pa_init(&mset);
 #endif
 		int action = pa_rand_action();
 		// generate action set
 		NODE *aset = NULL; int anum = 0;
-		int asize = action_set(&mset, &aset, action, &anum);
+		int asize = set_action(&mset, &aset, action, &anum);
 		// get environment feedback
 		double reward = execute_action(action);
 		reset = is_reset();
@@ -205,10 +206,10 @@ int explore_multi(int step)
 		if(prev_aset != NULL) {
 			set_validate(&prev_aset, &prev_asize, &prev_anum);
 #ifdef XCSF
-			update_set(&prev_aset, &prev_asize, &prev_anum, 
+			set_update(&prev_aset, &prev_asize, &prev_anum, 
 					pa_best_val(), prev_reward, &kset, prev_dstate);
 #else
-			update_set(&prev_aset, &prev_asize, &prev_anum, 
+			set_update(&prev_aset, &prev_asize, &prev_anum, 
 					pa_best_val(), prev_reward, &kset);
 #endif
 			ga(&prev_aset, prev_asize, prev_anum, step+steps, prev_state, &kset);
@@ -217,25 +218,25 @@ int explore_multi(int step)
 		if(reset) {
 			set_validate(&aset, &asize, &anum);
 #ifdef XCSF
-			update_set(&aset, &asize, &anum, 0.0, reward, &kset, dstate);
+			set_update(&aset, &asize, &anum, 0.0, reward, &kset, dstate);
 #else
-			update_set(&aset, &asize, &anum, 0.0, reward, &kset);
+			set_update(&aset, &asize, &anum, 0.0, reward, &kset);
 #endif
 			ga(&aset, asize, anum, step+steps, state, &kset);
 		}
 		// next step
-		free_set(&mset);
-		free_set(&prev_aset);
+		set_free(&mset);
+		set_free(&prev_aset);
 		prev_aset = aset;
-		clean_set(&kset, &prev_aset, false);
+		set_clean(&kset, &prev_aset, false);
 		prev_reward = reward;
 		strncpy(prev_state, state, state_length);
 #ifdef XCSF
 		memcpy(prev_dstate, dstate, sizeof(double)*pred_length);
 #endif
 	}
-	clean_set(&kset, &prev_aset, true);
-	free_set(&prev_aset);
+	set_clean(&kset, &prev_aset, true);
+	set_free(&prev_aset);
 	return step+steps;
 }
 
@@ -259,18 +260,18 @@ void exploit_multi(int *perf, double *err, int trial, int step)
 #endif
 		// generate match set
 		NODE *mset = NULL;
-		match_set(&mset, state, step, &kset);
+		set_match(&mset, state, step, &kset);
 		// select the best move
 #ifdef XCSF
-		init_pa(&mset, dstate);
+		pa_init(&mset, dstate);
 #else
-		init_pa(&mset);
+		pa_init(&mset);
 #endif
 		int action = pa_best_action();
 		// generate action set
 		int anum = 0;
 		NODE *aset = NULL;
-		int asize = action_set(&mset, &aset, action, &anum);
+		int asize = set_action(&mset, &aset, action, &anum);
 		// get environment feedback
 		double reward = execute_action(action);
 		reset = is_reset();
@@ -278,10 +279,10 @@ void exploit_multi(int *perf, double *err, int trial, int step)
 		if(prev_aset != NULL) {
 			set_validate(&prev_aset, &prev_asize, &prev_anum);
 #ifdef XCSF
-			update_set(&prev_aset, &prev_asize, &prev_anum, 
+			set_update(&prev_aset, &prev_asize, &prev_anum, 
 					pa_best_val(), prev_reward, &kset, prev_dstate);
 #else
-			update_set(&prev_aset, &prev_asize, &prev_anum, 
+			set_update(&prev_aset, &prev_asize, &prev_anum, 
 					pa_best_val(), prev_reward, &kset);
 #endif
 			err[trial%PERF_AVG_TRIALS]+=fabs(GAMMA*pa_val(action)+prev_reward 
@@ -291,17 +292,17 @@ void exploit_multi(int *perf, double *err, int trial, int step)
 		if(reset) {
 			set_validate(&aset, &asize, &anum);
 #ifdef XCSF
-			update_set(&aset, &asize, &anum, 0.0, reward, &kset, dstate);
+			set_update(&aset, &asize, &anum, 0.0, reward, &kset, dstate);
 #else
-			update_set(&aset, &asize, &anum, 0.0, reward, &kset);
+			set_update(&aset, &asize, &anum, 0.0, reward, &kset);
 #endif
 			err[trial%PERF_AVG_TRIALS]+=fabs(reward-pa_val(action))/max_payoff;
 		}
 		// next step
-		free_set(&mset);
-		free_set(&prev_aset);
+		set_free(&mset);
+		set_free(&prev_aset);
 		prev_aset = aset;
-		clean_set(&kset, &prev_aset, false);
+		set_clean(&kset, &prev_aset, false);
 		prev_reward = reward;
 #ifdef XCSF
 		strncpy(prev_state, state, state_length);
@@ -309,8 +310,8 @@ void exploit_multi(int *perf, double *err, int trial, int step)
 #endif
 		prev_pred = pa_val(action);
 	}
-	clean_set(&kset, &prev_aset, true);
-	free_set(&prev_aset);
+	set_clean(&kset, &prev_aset, true);
+	set_free(&prev_aset);
 	perf[trial%PERF_AVG_TRIALS] = steps;
 	err[trial%PERF_AVG_TRIALS] /= steps;
 }
