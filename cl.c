@@ -23,18 +23,17 @@
 #include "random.h"
 #include "cl.h"
 
-_Bool mutate_act(CL *c);
-
 void cl_init(CL *c, int size, int time)
 {
 	cond_init(c);
+	act_init(c);
+	pred_init(c);
 	c->fit = INIT_FITNESS;
 	c->err = INIT_ERROR;
 	c->num = 1;
 	c->exp = 0;
 	c->size = size;
 	c->time = time;
-	pred_init(c);
 #ifdef SELF_ADAPT_MUTATION
 	sam_init(c);
 #endif
@@ -44,16 +43,11 @@ void cl_copy(CL *to, CL *from)
 {
 	cl_init(to, from->size, from->time);
 	cond_copy(to, from);
-	to->act = from->act;
+	act_copy(to, from);
 	pred_copy(to, from);
 #ifdef SELF_ADAPT_MUTATION
 	sam_copy(to, from);
 #endif
-}
-
-void rand_act(CL *c)
-{
-	c->act = irand(0, num_actions);
 }
 
 _Bool mutate(CL *c, char *state)
@@ -63,22 +57,8 @@ _Bool mutate(CL *c, char *state)
 	P_MUTATION = c->mu[0];
 #endif
 	_Bool mod = cond_mutate(c, state);
-	if(mutate_act(c))
+	if(act_mutate(c))
 		mod = true;
-	return mod;
-}
-
-_Bool mutate_act(CL *c)
-{
-	_Bool mod = false;
-	if(drand() < P_MUTATION) {
-		int act = 0;
-		do {
-			act = irand(0, num_actions);
-		} while(act == c->act);
-		c->act = act;
-		mod = true;
-	}
 	return mod;
 }
 
@@ -174,6 +154,7 @@ double cl_update_size(CL *c, double num_sum)
 void cl_free(CL *c)
 {
 	cond_free(c);
+	act_free(c);
 	pred_free(c);
 #ifdef SELF_ADAPT_MUTATION
 	sam_free(c);
@@ -184,7 +165,7 @@ void cl_free(CL *c)
 void cl_print(CL *c)
 {
 	cond_print(c);
-	printf("%d %f %f %d %d %f %d\n",
-			c->act, c->err, c->fit, c->num, c->exp, c->size, c->time);
+	act_print(c);
+	printf("%f %f %d %d %f %d\n", c->err, c->fit, c->num, c->exp, c->size, c->time);
 	pred_print(c);
 }
