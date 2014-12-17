@@ -24,7 +24,7 @@
 #include "random.h"
 #include "cl.h"
 #include "cl_set.h"
-#include "maze.h"
+#include "env_maze.h"
 
 #define MAX_PAYOFF 1000.0
 const int x_moves[] ={ 0, +1, +1, +1,  0, -1, -1, -1}; 

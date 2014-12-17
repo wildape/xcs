@@ -21,8 +21,8 @@
 #include <math.h>
 #include "cons.h"
 #include "random.h"
-#include "mux.h"
-#include "maze.h"
+#include "env_mux.h"
+#include "env_maze.h"
 
 int env;
 #define MUX 0

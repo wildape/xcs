@@ -21,7 +21,7 @@
 #include <math.h>
 #include "cons.h"
 #include "random.h"
-#include "mux.h"
+#include "env_mux.h"
 
 #define MAX_PAYOFF 1000.0
 
