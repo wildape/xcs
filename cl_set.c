@@ -64,8 +64,7 @@ void set_match(NODE **mset, char *state, int time, NODE **kset)
 				// new classifier with matching condition & action
 				CL *new = malloc(sizeof(CL));
 				cl_init(new, m_num+1, time);
-				cond_match(new, state);
-				new->act = i;
+				cl_cover(new, state, i);
 				pop_add(new);
 				set_add(mset, new);
 				act_covered[i]++; 

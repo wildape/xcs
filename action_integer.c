@@ -53,6 +53,13 @@ void act_rand(CL *c)
 	c->act = irand(0, num_actions);
 }
 
+void act_match(CL *c, char *state, int i)
+{
+	c->act = i;
+	// remove unused parameter warnings
+	(void)state;
+}
+
 _Bool act_duplicate(CL *c1, CL *c2)
 {
 	if(c1->act == c2->act)

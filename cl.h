@@ -45,6 +45,7 @@ double cl_acc(CL *c);
 double cl_del_vote(CL *c, double avg_fit);
 double cl_update_size(CL *c, double num_sum);
 void cl_copy(CL *to, CL *from);
+void cl_cover(CL *c, char *state, int i);
 void cl_free(CL *c);
 void cl_init(CL *c, int size, int time);
 void cl_print(CL *c);
@@ -69,6 +70,7 @@ _Bool act_mutate(CL *c);
 void act_copy(CL *to, CL *from);
 void act_free(CL *c);
 void act_init(CL *c);
+void act_match(CL *c, char *state, int i);
 void act_print(CL *c);
 void act_rand(CL *c);
 

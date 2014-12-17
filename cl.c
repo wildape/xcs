@@ -60,6 +60,12 @@ void cl_copy(CL *to, CL *from)
 #endif
 }
 
+void cl_cover(CL *c, char *state, int i)
+{
+	cond_match(c, state);
+	act_match(c, state, i);
+}
+
 _Bool mutate(CL *c, char *state)
 {
 #ifdef SELF_ADAPT_MUTATION
