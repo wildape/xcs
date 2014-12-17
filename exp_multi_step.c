@@ -28,6 +28,7 @@
 #include "cons.h"
 #include "cl.h"
 #include "cl_set.h"
+#include "pa.h"
 #include "ga.h"
 #include "env.h"
 #include "perf.h"

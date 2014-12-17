@@ -35,9 +35,6 @@
 _Bool set_action_covered(NODE **set, int action);
 void set_subsumption(NODE **set, int *size, int *num, NODE **kset);
 void set_update_fit(NODE **set, int size, int num_sum);
-
-double *pa;
-double *nr;
  
 void pop_init()
 {
@@ -293,73 +290,6 @@ void set_print(NODE *set)
 {
 	for(NODE *iter = set; iter != NULL; iter = iter->next)
 		cl_print(iter->cl);
-}
-
-#ifdef XCSF
-void pa_init(NODE **set, double *state)
-#else
-void pa_init(NODE **set)
-#endif
-{
-	if(pa == NULL) {
-		pa = malloc(sizeof(double)*num_actions);
-		nr = malloc(sizeof(double)*num_actions);
-	}
-	for(int i = 0; i < num_actions; i++) {
-		pa[i] = 0.0;
-		nr[i] = 0.0;
-	}
-	for(NODE *iter = *set; iter != NULL; iter = iter->next) {
-		CL *c = iter->cl;
-#ifdef XCSF
-		pa[c->act] += pred_compute(c, state) * c->fit;
-#else
-		pa[c->act] += c->pre * c->fit;
-#endif
-		nr[c->act] += c->fit;
-	}
-	for(int i = 0; i < num_actions; i++) {
-		if(nr[i] != 0.0)
-			pa[i] /= nr[i];
-		else
-			pa[i] = 0.0;
-	}
-}
-
-int pa_best_action()
-{
-	int action = 0;
-	for(int i = 1; i < num_actions; i++) {
-		if(pa[action] < pa[i])
-			action = i;
-	}
-	return action;
-}
-
-int pa_rand_action()
-{
-	int action = 0;
-	do {
-		action = irand(0, num_actions);
-	} while(nr[action] == 0);
-	return action;
-}
-
-double pa_best_val()
-{
-	double max = pa[0];
-	for(int i = 1; i < num_actions; i++) {
-		if(max < pa[i])
-			max = pa[i];
-	}
-	return max;
-}
-
-double pa_val(int act)
-{
-	if(act >= 0 && act < num_actions)
-		return pa[act];
-	return -1.0;
 }
 
 void set_times(NODE **set, int time)
