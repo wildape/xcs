@@ -76,11 +76,12 @@ void act_rand(CL *c);
 // classifier prediction
 #ifdef XCSF
 double pred_compute(CL *c, double *state);
+double pred_update_err(CL *c, double p, double *state);
 void pred_update(CL *c, double p, double *state);
 #else
 double pred_update(CL *c, double p);
-#endif
 double pred_update_err(CL *c, double p);
+#endif
 void pred_copy(CL *to, CL *from);
 void pred_free(CL *c);
 void pred_init(CL *c);
