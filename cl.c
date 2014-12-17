@@ -62,20 +62,8 @@ void cl_copy(CL *to, CL *from)
 
 void cl_cover(CL *c, char *state, int i)
 {
-	cond_match(c, state);
-	act_match(c, state, i);
-}
-
-_Bool mutate(CL *c, char *state)
-{
-#ifdef SELF_ADAPT_MUTATION
-	sam_adapt(c);
-	P_MUTATION = c->mu[0];
-#endif
-	_Bool mod = cond_mutate(c, state);
-	if(act_mutate(c))
-		mod = true;
-	return mod;
+	cond_cover(c, state);
+	act_cover(c, state, i);
 }
 
 _Bool cl_duplicate(CL *c1, CL *c2)

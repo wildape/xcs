@@ -47,7 +47,7 @@ void cond_copy(CL *to, CL *from)
 	memcpy(to->con, from->con, sizeof(char)*state_length);
 }                              
  
-_Bool match(CL *c, char *state)
+_Bool cond_match(CL *c, char *state)
 {
 	for(int i = 0; i < state_length; i++) {
 		if(c->con[i] != DONT_CARE && c->con[i] != state[i])
@@ -70,7 +70,7 @@ void cond_rand(CL *c)
 	}
 }
 
-void cond_match(CL *c, char *state)
+void cond_cover(CL *c, char *state)
 {
 	for(int i = 0; i < state_length; i++) {
 		if(drand() < P_DONTCARE)

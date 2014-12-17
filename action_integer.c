@@ -53,7 +53,7 @@ void act_rand(CL *c)
 	c->act = irand(0, num_actions);
 }
 
-void act_match(CL *c, char *state, int i)
+void act_cover(CL *c, char *state, int i)
 {
 	c->act = i;
 	// remove unused parameter warnings

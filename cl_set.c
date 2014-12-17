@@ -48,7 +48,7 @@ void set_match(NODE **mset, char *state, int time, NODE **kset)
 		act_covered[i] = false;
 	// find matching classifiers in the population
 	for(NODE *iter = pset; iter != NULL; iter = iter->next) {
-		if(match(iter->cl, state)) {
+		if(cond_match(iter->cl, state)) {
 			set_add(mset, iter->cl);
 			act_covered[iter->cl->act] = true;
 			m_num += iter->cl->num;
@@ -73,7 +73,7 @@ void set_match(NODE **mset, char *state, int time, NODE **kset)
 		// enforce population size limit
 		while(pop_num_sum > POP_SIZE) {
 			NODE * del = pop_del();
-			if(match(del->cl, state)) {
+			if(cond_match(del->cl, state)) {
 				set_validate(mset, &m_size, &m_num);
 				if(!set_action_covered(mset, del->cl->act)) { 
 					act_covered[del->cl->act] = false;

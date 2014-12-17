@@ -40,7 +40,6 @@ typedef struct CL
 _Bool cl_duplicate(CL *c1, CL *c2);
 _Bool cl_subsumer(CL *c);
 _Bool cl_subsumes(CL *c1, CL *c2);
-_Bool mutate(CL *c, char *state);
 double cl_acc(CL *c);
 double cl_del_vote(CL *c, double avg_fit);
 double cl_update_size(CL *c, double num_sum);
@@ -56,11 +55,11 @@ _Bool cond_crossover(CL *c1, CL *c2);
 _Bool cond_duplicate(CL *c1, CL *c2);
 _Bool cond_general(CL *c1, CL *c2);
 _Bool cond_mutate(CL *c, char *state);
-_Bool match(CL *c, char *state);
+_Bool cond_match(CL *c, char *state);
 void cond_copy(CL *to, CL *from);
 void cond_free(CL *c);
 void cond_init(CL *c);
-void cond_match(CL *c, char *mcon);
+void cond_cover(CL *c, char *mcon);
 void cond_print(CL *c);
 void cond_rand(CL *c);
 
@@ -70,7 +69,7 @@ _Bool act_mutate(CL *c);
 void act_copy(CL *to, CL *from);
 void act_free(CL *c);
 void act_init(CL *c);
-void act_match(CL *c, char *state, int i);
+void act_cover(CL *c, char *state, int i);
 void act_print(CL *c);
 void act_rand(CL *c);
 

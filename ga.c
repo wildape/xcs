@@ -35,6 +35,8 @@
 #include "cl_set.h"    
 #include "ga.h"
 
+void ga_crossover(CL *c1, CL *c2);
+_Bool ga_mutate(CL *c, char *state);
 CL *ga_select_parent(NODE **set, double fit_sum);
 void ga_subsume(CL *c, CL *c1p, CL *c2p, NODE **set, int size);
 
@@ -61,9 +63,9 @@ void ga(NODE **set, int size, int num, int time, char *state, NODE **kset)
 	c1->fit = FIT_REDUC * (c1->fit + c2->fit)/2.0;
 	c2->fit = c1->fit;
 	// apply genetic operators to offspring
-	cond_crossover(c1, c2);
-	mutate(c1, state);
-	mutate(c2, state);
+	ga_crossover(c1, c2);
+	ga_mutate(c1, state);
+	ga_mutate(c2, state);
 	// add offspring to population
 	if(GA_SUBSUMPTION) {
 		ga_subsume(c1, c1p, c2p, set, size);
@@ -131,4 +133,21 @@ CL *ga_select_parent(NODE **set, double fit_sum)
 		sum += iter->cl->fit;
 	}
 	return iter->cl;
+}
+
+_Bool ga_mutate(CL *c, char *state)
+{
+#ifdef SELF_ADAPT_MUTATION
+	sam_adapt(c);
+	P_MUTATION = c->mu[0];
+#endif
+	_Bool mod = cond_mutate(c, state);
+	if(act_mutate(c))
+		mod = true;
+	return mod;
+}
+
+void ga_crossover(CL *c1, CL *c2)
+{
+	cond_crossover(c1, c2);
 }
