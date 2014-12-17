@@ -61,7 +61,7 @@ void ga(NODE **set, int size, int num, int time, char *state, NODE **kset)
 	c1->fit = FIT_REDUC * (c1->fit + c2->fit)/2.0;
 	c2->fit = c1->fit;
 	// apply genetic operators to offspring
-	two_pt_cross(c1, c2);
+	cond_crossover(c1, c2);
 	mutate(c1, state);
 	mutate(c2, state);
 	// add offspring to population

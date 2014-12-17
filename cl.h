@@ -47,12 +47,19 @@ void cl_update_fit(CL *c, double acc_sum, double acc);
 double cl_update_size(CL *c, double num_sum);
 _Bool cl_subsumer(CL *c);
 
-// classifier condition and action
-void rand_cond(CL *c);
-void match_con(CL *c, char *mcon);
-void rand_act(CL *c);
+// classifier condition 
+void cond_init(CL *c);
+void cond_free(CL *c);
+void cond_print(CL *c);
+void cond_copy(CL *to, CL *from);
+void cond_rand(CL *c);
+void cond_match(CL *c, char *mcon);
 _Bool match(CL *c, char *state);
-_Bool two_pt_cross(CL *c1, CL *c2);
+_Bool cond_crossover(CL *c1, CL *c2);
+_Bool cond_mutate(CL *c, char *state);
+
+// classifier action
+void rand_act(CL *c);
 _Bool mutate(CL *c, char *state);
 _Bool cl_duplicate(CL *c1, CL *c2);
 _Bool cl_general(CL *c1, CL *c2);

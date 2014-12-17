@@ -24,11 +24,10 @@
 #include "cl.h"
 
 _Bool mutate_act(CL *c);
-_Bool mutate_con(CL *c, char *state);
 
 void cl_init(CL *c, int size, int time)
 {
-	c->con = malloc(sizeof(char)*state_length);
+	cond_init(c);
 	c->fit = INIT_FITNESS;
 	c->err = INIT_ERROR;
 	c->num = 1;
@@ -44,7 +43,7 @@ void cl_init(CL *c, int size, int time)
 void cl_copy(CL *to, CL *from)
 {
 	cl_init(to, from->size, from->time);
-	memcpy(to->con, from->con, sizeof(char)*state_length);
+	cond_copy(to, from);
 	to->act = from->act;
 	pred_copy(to, from);
 #ifdef SELF_ADAPT_MUTATION
@@ -52,76 +51,9 @@ void cl_copy(CL *to, CL *from)
 #endif
 }
 
-void rand_cond(CL *c)
-{
-	for(int i = 0; i < state_length; i++) {
-		if(drand() < P_DONTCARE) 
-			c->con[i] = DONT_CARE;
-		else {
-			if(drand() < 0.5)
-				c->con[i] = '0';
-			else
-				c->con[i] = '1';
-		}
-	}
-}
-
-void match_con(CL *c, char *state)
-{
-	for(int i = 0; i < state_length; i++) {
-		if(drand() < P_DONTCARE)
-			c->con[i] = DONT_CARE;
-		else
-			c->con[i] = state[i];
-	}
-}
-
 void rand_act(CL *c)
 {
 	c->act = irand(0, num_actions);
-}
-
-_Bool match(CL *c, char *state)
-{
-	for(int i = 0; i < state_length; i++) {
-		if(c->con[i] != DONT_CARE && c->con[i] != state[i])
-			return false;
-	}
-	return true;
-}
-
-_Bool two_pt_cross(CL *c1, CL *c2) 
-{
-	_Bool changed = false;
-	if(drand() < P_CROSSOVER) {
-		int p1 = irand(0, state_length);
-		int p2 = irand(0, state_length)+1;
-		if(p1 > p2) {
-			int help = p1;
-			p1 = p2;
-			p2 = help;
-		}
-		else if(p1 == p2) {
-			p2++;
-		}
-		char cond1[state_length];
-		char cond2[state_length];
-		strncpy(cond1, c1->con, state_length);
-		strncpy(cond2, c2->con, state_length);
-		for(int i = p1; i < p2; i++) { 
-			if(cond1[i] != cond2[i]) {
-				changed = true;
-				char help = c1->con[i];
-				c1->con[i] = cond2[i];
-				c2->con[i] = help;
-			}
-		}
-		if(changed) {
-			strncpy(c1->con, cond1, state_length);
-			strncpy(c2->con, cond2, state_length);
-		}
-	}
-	return changed;
 }
 
 _Bool mutate(CL *c, char *state)
@@ -130,7 +62,7 @@ _Bool mutate(CL *c, char *state)
 	sam_adapt(c);
 	P_MUTATION = c->mu[0];
 #endif
-	_Bool mod = mutate_con(c, state);
+	_Bool mod = cond_mutate(c, state);
 	if(mutate_act(c))
 		mod = true;
 	return mod;
@@ -146,21 +78,6 @@ _Bool mutate_act(CL *c)
 		} while(act == c->act);
 		c->act = act;
 		mod = true;
-	}
-	return mod;
-}
-
-_Bool mutate_con(CL *c, char *state)
-{
-	_Bool mod = false;
-	for(int i = 0; i < state_length; i++) {
-		if(drand() < P_MUTATION) {
-			if(c->con[i] == DONT_CARE)
-				c->con[i] = state[i];
-			else
-				c->con[i] = DONT_CARE;
-			mod = true;
-		}
 	}
 	return mod;
 }
@@ -256,7 +173,7 @@ double cl_update_size(CL *c, double num_sum)
 
 void cl_free(CL *c)
 {
-	free(c->con);
+	cond_free(c);
 	pred_free(c);
 #ifdef SELF_ADAPT_MUTATION
 	sam_free(c);
@@ -266,8 +183,7 @@ void cl_free(CL *c)
 
 void cl_print(CL *c)
 {
-	for(int i = 0; i < state_length; i++)
-		printf("%c", c->con[i]);
+	cond_print(c);
 	printf("%d %f %f %d %d %f %d\n",
 			c->act, c->err, c->fit, c->num, c->exp, c->size, c->time);
 	pred_print(c);
