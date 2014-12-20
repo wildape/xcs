@@ -31,8 +31,6 @@ typedef struct CL
 #endif
 #ifdef SELF_ADAPT_MUTATION
 	double *mu;
-	int *iset;
-	double *gset;
 #endif
 } CL;
 
