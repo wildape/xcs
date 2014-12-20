@@ -74,8 +74,7 @@ double gasdev()
 			v1 = (drand()*2.0)-1.0;
 			v2 = (drand()*2.0)-1.0;
 			rsq = (v1*v1)+(v2*v2);
-		}
-		while(rsq >= 1.0 || rsq == 0.0);
+		} while(rsq >= 1.0 || rsq == 0.0);
 		fac = sqrt(-2.0*log(rsq)/rsq);
 		gset = v1*fac;
 		iset = 1;
