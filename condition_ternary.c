@@ -143,10 +143,11 @@ _Bool cond_general(CL *c1, CL *c2)
  
 _Bool cond_duplicate(CL *c1, CL *c2)
 {
-	if(strcmp(c1->con, c2->con) == 0)
-		return true;
-	else
-		return false;
+	for(int i = 0; i < state_length; i++) {
+		if(c1->con[i] != c2->con[i])
+			return false;
+	}
+	return false;
 }
 
 void cond_free(CL *c)
