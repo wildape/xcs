@@ -73,8 +73,8 @@ void explore_single(int time)
 #endif
 	ga(&aset, asize, anum, time, state, &kset);
 	set_free(&aset);
-	set_clean(&kset, &mset, true);
 	set_free(&mset);
+	set_kill(&kset);
 }
 
 void exploit_single(int time, int *correct, double *error)
@@ -98,7 +98,7 @@ void exploit_single(int time, int *correct, double *error)
 		correct[time%PERF_AVG_TRIALS] = 0;
 	error[time%PERF_AVG_TRIALS] = fabs(reward - pa_best_val());
 	set_free(&aset);
-	set_clean(&kset, &mset, true);
 	set_free(&mset);
+	set_kill(&kset);
 }
  
