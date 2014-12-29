@@ -142,7 +142,7 @@ _Bool ga_mutate(CL *c, char *state)
 	P_MUTATION = c->mu[0];
 #endif
 	_Bool mod = cond_mutate(&c->cond, state);
-	if(act_mutate(c))
+	if(act_mutate(&c->act))
 		mod = true;
 	return mod;
 }

@@ -47,7 +47,7 @@ void pop_init()
 			CL *new = malloc(sizeof(CL));
 			cl_init(new, POP_SIZE, 0);
 			cond_rand(&new->cond);
-			act_rand(new);
+			act_rand(&new->act);
 			pop_add(new);
 		}
 	}
@@ -64,7 +64,7 @@ void set_match(NODE **mset, char *state, int time, NODE **kset)
 	for(NODE *iter = pset; iter != NULL; iter = iter->next) {
 		if(cond_match(&iter->cl->cond, state)) {
 			set_add(mset, iter->cl);
-			act_covered[iter->cl->act] = true;
+			act_covered[iter->cl->act.a] = true;
 			m_num += iter->cl->num;
 			m_size++;
 		}
@@ -89,8 +89,8 @@ void set_match(NODE **mset, char *state, int time, NODE **kset)
 			NODE * del = pop_del();
 			if(cond_match(&del->cl->cond, state)) {
 				set_validate(mset, &m_size, &m_num);
-				if(!set_action_covered(mset, del->cl->act)) { 
-					act_covered[del->cl->act] = false;
+				if(!set_action_covered(mset, del->cl->act.a)) { 
+					act_covered[del->cl->act.a] = false;
 					again = true;
 				}     
 			}
@@ -105,7 +105,7 @@ void set_match(NODE **mset, char *state, int time, NODE **kset)
 _Bool set_action_covered(NODE **set, int action)
 {
 	for(NODE *iter = *set; iter != NULL; iter = iter->next) {
-		if(iter->cl->act == action)
+		if(iter->cl->act.a == action)
 			return true;
 	}
 	return false;
@@ -115,7 +115,7 @@ int set_action(NODE **mset, NODE **aset, int action, int *num)
 {
 	int size = 0;
 	for(NODE *iter = *mset; iter != NULL; iter = iter->next) {
-		if(iter->cl->act == action) {
+		if(iter->cl->act.a == action) {
 			size++;
 			*num += iter->cl->num;
 			set_add(aset, iter->cl);

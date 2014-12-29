@@ -16,11 +16,12 @@
  */
 
 #include "cond_ternary.h"
+#include "act_integer.h"
 
 typedef struct CL
 {
 	COND cond;
-	int act;
+	ACT act;
 	double err;
 	double fit;
 	int num;
@@ -65,14 +66,14 @@ void cond_print(COND *cond);
 void cond_rand(COND *cond);
 
 // classifier action
-_Bool act_duplicate(CL *c1, CL *c2);
-_Bool act_mutate(CL *c);
-void act_copy(CL *to, CL *from);
-void act_free(CL *c);
-void act_init(CL *c);
-void act_cover(CL *c, char *state, int i);
-void act_print(CL *c);
-void act_rand(CL *c);
+_Bool act_duplicate(ACT *act1, ACT *act2);
+_Bool act_mutate(ACT *act);
+void act_copy(ACT *to, ACT *from);
+void act_free(ACT *act);
+void act_init(ACT *act);
+void act_cover(ACT *act, char *state, int i);
+void act_print(ACT *act);
+void act_rand(ACT *act);
 
 // classifier prediction
 #ifdef XCSF

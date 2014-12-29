@@ -52,11 +52,11 @@ void pa_build(NODE **set)
 	for(NODE *iter = *set; iter != NULL; iter = iter->next) {
 		CL *c = iter->cl;
 #ifdef XCSF
-		pa[c->act] += pred_compute(c, state) * c->fit;
+		pa[c->act.a] += pred_compute(c, state) * c->fit;
 #else
-		pa[c->act] += c->pre * c->fit;
+		pa[c->act.a] += c->pre * c->fit;
 #endif
-		nr[c->act] += c->fit;
+		nr[c->act.a] += c->fit;
 	}
 	for(int i = 0; i < num_actions; i++) {
 		if(nr[i] != 0.0)

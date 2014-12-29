@@ -31,58 +31,58 @@
 #include "random.h"
 #include "cl.h"
 
-void act_init(CL *c)
+void act_init(ACT *act)
 {
 	// remove unused parameter warnings
-	(void)c;
+	(void)act;
 }
 
-void act_free(CL *c)
+void act_free(ACT *act)
 {
 	// remove unused parameter warnings
-	(void)c;
+	(void)act;
 }
 
-void act_copy(CL *to, CL *from)
+void act_copy(ACT *to, ACT *from)
 {
-	to->act = from->act;
+	to->a = from->a;
 }    
 
-void act_rand(CL *c)
+void act_rand(ACT *act)
 {
-	c->act = irand(0, num_actions);
+	act->a = irand(0, num_actions);
 }
 
-void act_cover(CL *c, char *state, int i)
+void act_cover(ACT *act, char *state, int i)
 {
-	c->act = i;
+	act->a = i;
 	// remove unused parameter warnings
 	(void)state;
 }
 
-_Bool act_duplicate(CL *c1, CL *c2)
+_Bool act_duplicate(ACT *act1, ACT *act2)
 {
-	if(c1->act == c2->act)
+	if(act1->a == act2->a)
 		return true;
 	else
 		return false;
 }
              
-_Bool act_mutate(CL *c)
+_Bool act_mutate(ACT *act)
 {
 	_Bool mod = false;
 	if(drand() < P_MUTATION) {
-		int act = 0;
+		int a = 0;
 		do {
-			act = irand(0, num_actions);
-		} while(act == c->act);
-		c->act = act;
+			a = irand(0, num_actions);
+		} while(a == act->a);
+		act->a = a;
 		mod = true;
 	}
 	return mod;
 }
  
-void act_print(CL *c)
+void act_print(ACT *act)
 {
-	printf("action = %d\n", c->act);
+	printf("action = %d\n", act->a);
 }

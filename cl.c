@@ -36,7 +36,7 @@
 void cl_init(CL *c, int size, int time)
 {
 	cond_init(&c->cond);
-	act_init(c);
+	act_init(&c->act);
 	pred_init(c);
 	c->fit = INIT_FITNESS;
 	c->err = INIT_ERROR;
@@ -53,7 +53,7 @@ void cl_copy(CL *to, CL *from)
 {
 	cl_init(to, from->size, from->time);
 	cond_copy(&to->cond, &from->cond);
-	act_copy(to, from);
+	act_copy(&to->act, &from->act);
 	pred_copy(to, from);
 #ifdef SELF_ADAPT_MUTATION
 	sam_copy(to, from);
@@ -63,13 +63,13 @@ void cl_copy(CL *to, CL *from)
 void cl_cover(CL *c, char *state, int i)
 {
 	cond_cover(&c->cond, state);
-	act_cover(c, state, i);
+	act_cover(&c->act, state, i);
 }
 
 _Bool cl_duplicate(CL *c1, CL *c2)
 {
 	if(cond_duplicate(&c1->cond, &c2->cond) 
-			&& act_duplicate(c1, c2))
+			&& act_duplicate(&c1->act, &c2->act))
 		return true;
 	else
 		return false;
@@ -77,8 +77,10 @@ _Bool cl_duplicate(CL *c1, CL *c2)
 
 _Bool cl_subsumes(CL *c1, CL *c2)
 {
-	if(act_duplicate(c1, c2) && c1->exp > THETA_SUB && c1->err < EPS_0)
-		if(cond_general(&c1->cond, &c2->cond))
+	if(act_duplicate(&c1->act, &c2->act) 
+			&& c1->exp > THETA_SUB 
+			&& c1->err < EPS_0
+			&& cond_general(&c1->cond, &c2->cond))
 			return true;
 	return false;
 }
@@ -123,7 +125,7 @@ double cl_update_size(CL *c, double num_sum)
 void cl_free(CL *c)
 {
 	cond_free(&c->cond);
-	act_free(c);
+	act_free(&c->act);
 	pred_free(c);
 #ifdef SELF_ADAPT_MUTATION
 	sam_free(c);
@@ -134,7 +136,7 @@ void cl_free(CL *c)
 void cl_print(CL *c)
 {
 	cond_print(&c->cond);
-	act_print(c);
+	act_print(&c->act);
 	printf("%f %f %d %d %f %d\n", c->err, c->fit, c->num, c->exp, c->size, c->time);
 	pred_print(c);
 }
