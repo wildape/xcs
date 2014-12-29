@@ -63,9 +63,7 @@ const int y_moves[] ={-1, -1,  0, +1, +1, +1,  0, -1};
 void bin_sensor(char s, char *bin);
 
 char *state;
-#ifdef XCSF
 double *dstate;
-#endif
 char maze[50][50];
 int xpos;
 int ypos;
@@ -105,12 +103,10 @@ int maze_init(char *filename)
 	state_length = 8*encoding_bits;
 	state = malloc(sizeof(char)*state_length);
 	num_actions = 8;
-	pred_length = 8;
 	multi_step = true;
 	max_payoff = MAX_PAYOFF;
-#ifdef XCSF
-	dstate = malloc(sizeof(double)*pred_length);
-#endif
+	dstate_length = 8;
+	dstate = malloc(sizeof(double)*dstate_length);
 	printf("Loaded MAZE = %s\n", filename);
 	return EXIT_SUCCESS;
 }
@@ -118,9 +114,7 @@ int maze_init(char *filename)
 void maze_free()
 {
 	free(state);
-#ifdef XCSF
 	free(dstate);
-#endif
 }
 
 void maze_rand_pos()
@@ -159,7 +153,6 @@ char *maze_state()
 	return state;
 }
 
-#ifdef XCSF
 double *maze_dstate()
 {
 	double tmp;
@@ -173,11 +166,10 @@ double *maze_dstate()
 		}
 	}
 	// scale between [-1,1]
-	for(int i = 0; i < pred_length; i++)
+	for(int i = 0; i < dstate_length; i++)
 		dstate[i] = (dstate[i]/((pow(encoding_bits,2)-1.0)/2.0))-1.0;
 	return dstate;
 }
-#endif
 
 void bin_sensor(char s, char *bin)
 {

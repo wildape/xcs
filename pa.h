@@ -15,11 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef XCSF
 void pa_build(NODE **set, double *state);
-#else
-void pa_build(NODE **set);
-#endif
 double pa_best_val();
 double pa_val(int act);   
 int pa_best_action();

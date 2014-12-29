@@ -33,11 +33,14 @@
 #include "random.h"
 #include "cl.h"
 
+double cl_update_err(CL *c, double p);
+double cl_update_size(CL *c, double num_sum);
+
 void cl_init(CL *c, int size, int time)
 {
 	cond_init(&c->cond);
 	act_init(&c->act);
-	pred_init(c);
+	pred_init(&c->pred);
 	c->fit = INIT_FITNESS;
 	c->err = INIT_ERROR;
 	c->num = 1;
@@ -54,7 +57,7 @@ void cl_copy(CL *to, CL *from)
 	cl_init(to, from->size, from->time);
 	cond_copy(&to->cond, &from->cond);
 	act_copy(&to->act, &from->act);
-	pred_copy(to, from);
+	pred_copy(&to->pred, &from->pred);
 #ifdef SELF_ADAPT_MUTATION
 	sam_copy(to, from);
 #endif
@@ -93,6 +96,24 @@ _Bool cl_subsumer(CL *c)
 		return false;
 }
 
+void cl_update(CL *c, double *state, double p, int set_num)
+{
+	c->exp++;
+	pred_compute(&c->pred, state);
+	cl_update_err(c, p);
+	pred_update(&c->pred, p, state);
+	cl_update_size(c, set_num);
+}
+
+double cl_update_err(CL *c, double p)
+{
+	if(c->exp < 1.0/BETA) 
+		c->err = (c->err * (c->exp-1.0) + fabs(p - c->pred.pre)) / (double)c->exp;
+	else
+		c->err += BETA * (fabs(p - c->pred.pre) - c->err);
+	return c->err * c->num;
+}
+ 
 double cl_del_vote(CL *c, double avg_fit)
 {
 	if(c->fit / c->num >= DELTA * avg_fit || c->exp < THETA_DEL)
@@ -126,7 +147,7 @@ void cl_free(CL *c)
 {
 	cond_free(&c->cond);
 	act_free(&c->act);
-	pred_free(c);
+	pred_free(&c->pred);
 #ifdef SELF_ADAPT_MUTATION
 	sam_free(c);
 #endif
@@ -138,5 +159,5 @@ void cl_print(CL *c)
 	cond_print(&c->cond);
 	act_print(&c->act);
 	printf("%f %f %d %d %f %d\n", c->err, c->fit, c->num, c->exp, c->size, c->time);
-	pred_print(c);
+	pred_print(&c->pred);
 }

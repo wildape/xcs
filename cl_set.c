@@ -197,28 +197,15 @@ NODE *pop_del()
 	return iter;
 }
 
-#ifdef XCSF
 void set_update(NODE **set, int *size, int *num, 
 		double max_p, double r, NODE **kset, double *state)
-#else
-void set_update(NODE **set, int *size, int *num, 
-		double max_p, double r, NODE **kset)
-#endif
 {
 	double p = r + (GAMMA * max_p);
-	for(NODE *iter = *set; iter != NULL; iter = iter->next) {
-		CL *c = iter->cl;
-		c->exp++;
-#ifdef XCSF
-		pred_update_err(c, p, state);
-		pred_update(c, p, state);
-#else
-		pred_update_err(c, p);
-		pred_update(c, p);
-#endif
-		cl_update_size(c, *num);
-	}
+
+	for(NODE *iter = *set; iter != NULL; iter = iter->next)
+		cl_update(iter->cl, state, p, *num);
 	set_update_fit(set, *size, *num);
+
 	if(ACTION_SUBSUMPTION)
 		set_subsumption(set, size, num, kset);
 }

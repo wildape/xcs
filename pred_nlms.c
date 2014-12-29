@@ -25,7 +25,8 @@
  * Widrow-Hoff update.)
  */
 
-#ifdef XCSF
+#ifdef NLMS_PREDICTION
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,89 +36,80 @@
 #include "cons.h"
 #include "cl.h"
 
-void pred_init(CL *c)
+void pred_init(PRED *pred)
 {
 #ifdef QUADRATIC
 	// offset(1) + n linear + n quadratic + n*(n-1)/2 mixed terms
-	c->weights_length = 1+2*pred_length+pred_length*(pred_length-1)/2;
+	pred->weights_length = 1+2*dstate_length+dstate_length*(dstate_length-1)/2;
 #else
-	c->weights_length = pred_length+1;
+	pred->weights_length = dstate_length+1;
 #endif
-	c->weights = malloc(sizeof(double) * c->weights_length);
-	c->weights[0] = XCSF_X0;
-	for(int i = 1; i < c->weights_length; i++)
-		c->weights[i] = 0.0;
+	pred->weights = malloc(sizeof(double) * pred->weights_length);
+	pred->weights[0] = XCSF_X0;
+	for(int i = 1; i < pred->weights_length; i++)
+		pred->weights[i] = 0.0;
 }
 
-void pred_copy(CL *to, CL *from)
+void pred_copy(PRED *to, PRED *from)
 {
 	memcpy(to->weights, from->weights, sizeof(double)*from->weights_length);
 }
 
-void pred_free(CL *c)
+void pred_free(PRED *pred)
 {
-	free(c->weights);
+	free(pred->weights);
 }
- 
-double pred_update_err(CL *c, double p, double *state)
+
+void pred_update(PRED *pred, double p, double *state)
 {
-	double pre = pred_compute(c, state);
-	if(c->exp < 1.0/BETA) 
-		c->err = (c->err * (c->exp-1.0) + fabs(p - pre)) / (double)c->exp;
-	else
-		c->err += BETA * (fabs(p - pre) - c->err);
-	return c->err * c->num;
-}
- 
-void pred_update(CL *c, double p, double *state)
-{
-	// pre has been updated for the current state during pred_update_err()
-	double error = p - c->pre; //pred_compute(c, state);
+	// pre must have been updated for the current state previously in cl_update
+	double error = p - pred->pre; //pred_compute(pred, state);
 	double norm = XCSF_X0 * XCSF_X0;
-	for(int i = 0; i < pred_length; i++)
+	for(int i = 0; i < dstate_length; i++)
 		norm += state[i] * state[i];
 	double correction = (XCSF_ETA * error) / norm;
 	// update first coefficient
-	c->weights[0] += XCSF_X0 * correction;
+	pred->weights[0] += XCSF_X0 * correction;
 	int index = 1;
 	// update linear coefficients
-	for(int i = 0; i < pred_length; i++)
-		c->weights[index++] += correction * state[i];
+	for(int i = 0; i < dstate_length; i++)
+		pred->weights[index++] += correction * state[i];
 #ifdef QUADRATIC
 	// update quadratic coefficients
-	for(int i = 0; i < pred_length; i++) {
-		for(int j = i; j < pred_length; j++) {
-			c->weights[index++] += correction * state[i] * state[j];
+	for(int i = 0; i < dstate_length; i++) {
+		for(int j = i; j < dstate_length; j++) {
+			pred->weights[index++] += correction * state[i] * state[j];
 		}
 	}
 #endif
 }
 
-double pred_compute(CL *c, double *state)
+double pred_compute(PRED *pred, double *state)
 {
 	// first coefficient is offset
-	double pre = XCSF_X0 * c->weights[0];
+	double pre = XCSF_X0 * pred->weights[0];
 	int index = 1;
 	// multiply linear coefficients with the prediction input
-	for(int i = 0; i < pred_length; i++)
-		pre += c->weights[index++] * state[i];
+	for(int i = 0; i < dstate_length; i++)
+		pre += pred->weights[index++] * state[i];
 #ifdef QUADRATIC
 	// multiply quadratic coefficients with prediction input
-	for(int i = 0; i < pred_length; i++) {
-		for(int j = i; j < pred_length; j++) {
-			pre += c->weights[index++] * state[i] * state[j];
+	for(int i = 0; i < dstate_length; i++) {
+		for(int j = i; j < dstate_length; j++) {
+			pre += pred->weights[index++] * state[i] * state[j];
 		}
 	}
 #endif
-	c->pre = pre;
+	pred->pre = pre;
 	return pre;
 } 
 
-void pred_print(CL *c)
+void pred_print(PRED *pred)
 {
 	printf("weights: ");
-	for(int i = 0; i < c->weights_length; i++)
-		printf("%f, ", c->weights[i]);
+	for(int i = 0; i < pred->weights_length; i++)
+		printf("%f, ", pred->weights[i]);
 	printf("\n");
 }
+
 #endif

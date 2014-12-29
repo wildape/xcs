@@ -18,6 +18,4 @@ void mux_init(int bits);
 void mux_free();
 double mux_execute(int act);
 char *mux_state();
-#ifdef XCSF
 double *mux_dstate();
-#endif

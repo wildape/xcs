@@ -39,11 +39,7 @@ void pa_init()
 	nr = malloc(sizeof(double)*num_actions);
 }
 
-#ifdef XCSF
 void pa_build(NODE **set, double *state)
-#else
-void pa_build(NODE **set)
-#endif
 {
 	for(int i = 0; i < num_actions; i++) {
 		pa[i] = 0.0;
@@ -51,11 +47,7 @@ void pa_build(NODE **set)
 	}
 	for(NODE *iter = *set; iter != NULL; iter = iter->next) {
 		CL *c = iter->cl;
-#ifdef XCSF
-		pa[c->act.a] += pred_compute(c, state) * c->fit;
-#else
-		pa[c->act.a] += c->pre * c->fit;
-#endif
+		pa[c->act.a] += pred_compute(&c->pred, state) * c->fit;
 		nr[c->act.a] += c->fit;
 	}
 	for(int i = 0; i < num_actions; i++) {

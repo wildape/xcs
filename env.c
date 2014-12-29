@@ -102,7 +102,6 @@ char *env_get_state()
 	exit(EXIT_FAILURE);
 }
 
-#ifdef XCSF
 double *env_get_dstate()
 {
 	switch(env) {
@@ -113,7 +112,6 @@ double *env_get_dstate()
 	}
 	exit(EXIT_FAILURE);
 }
-#endif
 
 _Bool env_is_reset()
 {

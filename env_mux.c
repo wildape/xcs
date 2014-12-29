@@ -38,21 +38,17 @@
 
 int pos_bits;
 char *state;
-#ifdef XCSF
 double *dstate;
-#endif
 
 void mux_init(int bits)
 {
-	pred_length = bits;
+	dstate_length = bits;
 	state_length = bits;
 	state = malloc(sizeof(char)*state_length);
 	num_actions = 2;
 	multi_step = false;
 	max_payoff = 1000.0;
-#ifdef XCSF
-	dstate = malloc(sizeof(double)*pred_length);
-#endif
+	dstate = malloc(sizeof(double)*dstate_length);
 	for(pos_bits = 1.0; pos_bits+pow(2.0,pos_bits) <= state_length; pos_bits++);
 	pos_bits--;
 }
@@ -60,10 +56,7 @@ void mux_init(int bits)
 void mux_free()
 {
 	free(state);
-#ifdef XCSF
 	free(dstate);
-#endif
-
 }
 
 char *mux_state()
@@ -77,7 +70,6 @@ char *mux_state()
 	return state;
 }
 
-#ifdef XCSF
 double *mux_dstate()
 {
 	for(int i = 0; i < state_length; i++) {
@@ -88,7 +80,6 @@ double *mux_dstate()
 	}
 	return dstate;
 }
-#endif      
 
 double mux_execute(int act)
 {

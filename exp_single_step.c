@@ -58,21 +58,13 @@ void explore_single(int time)
 	char *state = env_get_state();
 	NODE *mset = NULL, *kset = NULL;
 	set_match(&mset, state, time, &kset);
-#ifdef XCSF
 	double *dstate = env_get_dstate();
 	pa_build(&mset, dstate);
-#else
-	pa_build(&mset);
-#endif
 	int action = pa_rand_action();
 	NODE *aset = NULL; int anum = 0;
 	int asize = set_action(&mset, &aset, action, &anum);
 	double reward = env_exec_action(action);
-#ifdef XCSF
 	set_update(&aset, &asize, &anum, 0.0, reward, &kset, dstate);
-#else
-	set_update(&aset, &asize, &anum, 0.0, reward, &kset);
-#endif
 	ga(&aset, asize, anum, time, state, &kset);
 	set_free(&aset);
 	set_free(&mset);
@@ -84,12 +76,8 @@ void exploit_single(int time, int *correct, double *error)
 	char *state = env_get_state();
 	NODE *mset = NULL, *kset = NULL;
 	set_match(&mset, state, time, &kset);
-#ifdef XCSF
 	double *dstate = env_get_dstate();
 	pa_build(&mset, dstate);
-#else
-	pa_build(&mset);
-#endif
 	int action = pa_best_action();
 	NODE *aset = NULL; int anum = 0;
 	set_action(&mset, &aset, action, &anum);

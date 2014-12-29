@@ -57,9 +57,7 @@ void multi_step_exp(int *perf, double *err)
 
 int explore_multi(int step)
 {
-#ifdef XCSF
-	double prev_dstate[pred_length];
-#endif
+	double prev_dstate[dstate_length];
 	char prev_state[state_length];
 	NODE *prev_aset = NULL, *kset = NULL;
 	double prev_reward = 0.0;
@@ -69,18 +67,12 @@ int explore_multi(int step)
 	for(steps = 0; steps < TELETRANSPORTATION && !reset; steps++) {
 		// percieve environment
 		char *state = env_get_state();
-#ifdef XCSF
 		double *dstate = env_get_dstate();
-#endif
 		// generate match set
 		NODE *mset = NULL;
 		set_match(&mset, state, step+steps, &kset);
 		// select a random move
-#ifdef XCSF
 		pa_build(&mset, dstate);
-#else
-		pa_build(&mset);
-#endif
 		int action = pa_rand_action();
 		// generate action set
 		NODE *aset = NULL; int anum = 0;
@@ -91,23 +83,14 @@ int explore_multi(int step)
 		// update previous action set and run GA
 		if(prev_aset != NULL) {
 			set_validate(&prev_aset, &prev_asize, &prev_anum);
-#ifdef XCSF
 			set_update(&prev_aset, &prev_asize, &prev_anum, 
 					pa_best_val(), prev_reward, &kset, prev_dstate);
-#else
-			set_update(&prev_aset, &prev_asize, &prev_anum, 
-					pa_best_val(), prev_reward, &kset);
-#endif
 			ga(&prev_aset, prev_asize, prev_anum, step+steps, prev_state, &kset);
 		}
 		// in goal state, update current action set and run GA
 		if(reset) {
 			set_validate(&aset, &asize, &anum);
-#ifdef XCSF
 			set_update(&aset, &asize, &anum, 0.0, reward, &kset, dstate);
-#else
-			set_update(&aset, &asize, &anum, 0.0, reward, &kset);
-#endif
 			ga(&aset, asize, anum, step+steps, state, &kset);
 		}
 		// next step
@@ -117,9 +100,7 @@ int explore_multi(int step)
 		set_clean(&kset, &prev_aset, false);
 		prev_reward = reward;
 		strncpy(prev_state, state, state_length);
-#ifdef XCSF
-		memcpy(prev_dstate, dstate, sizeof(double)*pred_length);
-#endif
+		memcpy(prev_dstate, dstate, sizeof(double)*dstate_length);
 	}
 	set_clean(&kset, &prev_aset, true);
 	set_free(&prev_aset);
@@ -128,10 +109,8 @@ int explore_multi(int step)
 
 void exploit_multi(int *perf, double *err, int trial, int step)
 {
-#ifdef XCSF
-	double prev_dstate[pred_length];
+	double prev_dstate[dstate_length];
 	char prev_state[state_length];
-#endif
 	double prev_reward = 0.0, prev_pred = 0.0;
 	int steps, prev_asize = 0, prev_anum = 0;
 	NODE *prev_aset = NULL, *kset = NULL;
@@ -141,18 +120,12 @@ void exploit_multi(int *perf, double *err, int trial, int step)
 	for(steps = 0; steps < TELETRANSPORTATION && !reset; steps++) {
 		// percieve environment
 		char *state = env_get_state();
-#ifdef XCSF
 		double *dstate = env_get_dstate();
-#endif
 		// generate match set
 		NODE *mset = NULL;
 		set_match(&mset, state, step, &kset);
 		// select the best move
-#ifdef XCSF
 		pa_build(&mset, dstate);
-#else
-		pa_build(&mset);
-#endif
 		int action = pa_best_action();
 		// generate action set
 		int anum = 0;
@@ -164,24 +137,15 @@ void exploit_multi(int *perf, double *err, int trial, int step)
 		// update previous action set
 		if(prev_aset != NULL) {
 			set_validate(&prev_aset, &prev_asize, &prev_anum);
-#ifdef XCSF
 			set_update(&prev_aset, &prev_asize, &prev_anum, 
 					pa_best_val(), prev_reward, &kset, prev_dstate);
-#else
-			set_update(&prev_aset, &prev_asize, &prev_anum, 
-					pa_best_val(), prev_reward, &kset);
-#endif
 			err[trial%PERF_AVG_TRIALS]+=fabs(GAMMA*pa_val(action)+prev_reward 
 					-prev_pred)/max_payoff;
 		}
 		// in goal state, update current action set
 		if(reset) {
 			set_validate(&aset, &asize, &anum);
-#ifdef XCSF
 			set_update(&aset, &asize, &anum, 0.0, reward, &kset, dstate);
-#else
-			set_update(&aset, &asize, &anum, 0.0, reward, &kset);
-#endif
 			err[trial%PERF_AVG_TRIALS]+=fabs(reward-pa_val(action))/max_payoff;
 		}
 		// next step
@@ -190,10 +154,8 @@ void exploit_multi(int *perf, double *err, int trial, int step)
 		prev_aset = aset;
 		set_clean(&kset, &prev_aset, false);
 		prev_reward = reward;
-#ifdef XCSF
 		strncpy(prev_state, state, state_length);
-		memcpy(prev_dstate, dstate, sizeof(double)*pred_length);
-#endif
+		memcpy(prev_dstate, dstate, sizeof(double)*dstate_length);
 		prev_pred = pa_val(action);
 	}
 	set_clean(&kset, &prev_aset, true);

@@ -17,22 +17,20 @@
 
 #include "cond_ternary.h"
 #include "act_integer.h"
+#include "pred_nlms.h"
+#include "pred_constant.h"
 
 typedef struct CL
 {
 	COND cond;
 	ACT act;
+	PRED pred;
 	double err;
 	double fit;
 	int num;
 	int exp;
 	double size;
 	int time;
-	double pre;
-#ifdef XCSF
-	double *weights;
-	int weights_length;
-#endif
 #ifdef SELF_ADAPT_MUTATION
 	double *mu;
 #endif
@@ -44,12 +42,12 @@ _Bool cl_subsumer(CL *c);
 _Bool cl_subsumes(CL *c1, CL *c2);
 double cl_acc(CL *c);
 double cl_del_vote(CL *c, double avg_fit);
-double cl_update_size(CL *c, double num_sum);
 void cl_copy(CL *to, CL *from);
 void cl_cover(CL *c, char *state, int i);
 void cl_free(CL *c);
 void cl_init(CL *c, int size, int time);
 void cl_print(CL *c);
+void cl_update(CL *c, double *state, double p, int set_num);
 void cl_update_fit(CL *c, double acc_sum, double acc);
 
 // classifier condition 
@@ -76,18 +74,13 @@ void act_print(ACT *act);
 void act_rand(ACT *act);
 
 // classifier prediction
-#ifdef XCSF
-double pred_compute(CL *c, double *state);
-double pred_update_err(CL *c, double p, double *state);
-void pred_update(CL *c, double p, double *state);
-#else
-double pred_update(CL *c, double p);
-double pred_update_err(CL *c, double p);
-#endif
-void pred_copy(CL *to, CL *from);
-void pred_free(CL *c);
-void pred_init(CL *c);
-void pred_print(CL *c);
+double pred_compute(PRED *pred, double *state);
+double pred_update_err(PRED *pred, double p, double *state);
+void pred_update(PRED *pred, double p, double *state);
+void pred_copy(PRED *to, PRED *from);
+void pred_free(PRED *pred);
+void pred_init(PRED *pred);
+void pred_print(PRED *pred);
 
 // self-adaptive mutation
 void sam_adapt(CL *c);       

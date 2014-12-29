@@ -36,13 +36,8 @@ void set_match(NODE **mset, char *state, int time, NODE **kset);
 void set_print(NODE *set);
 void set_times(NODE **set, int time);
 void set_validate(NODE **set, int *size, int *num);
-#ifdef XCSF
 void set_update(NODE **set, int *size, int *num, double max_p, double r,
 		NODE **kset, double *state);
-#else
-void set_update(NODE **set, int *size, int *num, double max_p, double r, 
-		NODE **kset);
-#endif    
 #ifdef SELF_ADAPT_MUTATION
 double set_avg_mut(NODE **set, int m);
 #endif

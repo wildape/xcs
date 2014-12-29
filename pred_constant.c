@@ -20,7 +20,9 @@
  * The original XCS constant prediction module.
  */
 
-#ifndef XCSF
+//#ifdef CONSTANT_PREDICTION
+#ifndef NLMS_PREDICTION
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,45 +32,40 @@
 #include "cons.h"
 #include "cl.h"
 
-void pred_init(CL *c)
+void pred_init(PRED *pred)
 {
-	c->pre = INIT_PREDICTION;
+	pred->pre = INIT_PREDICTION;
 }
     
-double pred_update(CL *c, double p)
+void pred_update(PRED *pred, double p, double *state)
 {
-	if(c->exp < 1.0/BETA) 
-		c->pre = (c->pre * (c->exp-1.0) + p) / (double)c->exp;
-	else
-		c->pre += BETA * (p - c->pre);
-	return c->pre * c->num;
+	(void)state; // remove unused parameter warnings
+//	if(c->exp < 1.0/BETA) 
+//		c->pre = (c->pre * (c->exp-1.0) + p) / (double)c->exp;
+//	else
+		pred->pre += BETA * (p - pred->pre);
 }
 
-double pred_update_err(CL *c, double p)
+double pred_compute(PRED *pred, double *state)
 {
-	if(c->exp < 1.0/BETA)
-		c->err = (c->err * (c->exp-1.0) + fabs(p - c->pre)) / (double)c->exp;
-	else
-		c->err += BETA * (fabs(p - c->pre) - c->err);
-	return c->err * c->num;
-}     
-
-void pred_print(CL *c)
-{
-	printf("prediction: %f\n", c->pre);
+	(void)state; // remove unused parameter warnings
+	return pred->pre;
 }
 
-void pred_free(CL *c)
+void pred_print(PRED *pred)
+{
+	printf("prediction: %f\n", pred->pre);
+}
+
+void pred_free(PRED *pred)
 {
 	// remove unused parameter warnings
-	(void)c;
+	(void)pred;
 }
 
-void pred_copy(CL *to, CL *from)
+void pred_copy(PRED *to, PRED *from)
 {
-	// remove unused parameter warnings
-	(void)to;
-	(void)from;
+	to->pre = from->pre;
 }
 
 #endif

@@ -65,5 +65,5 @@ double THETA_SUB; // minimum experience of a classifier to become a subsumer
 _Bool multi_step; // whether the problem is single or multi-step
 double max_payoff; // maximum environment payoff for executing an action
 int num_actions; // number of executable actions a classifier can make
-int pred_length; // number of real-value input variables to compute prediction
+int dstate_length; // number of real-value input variables to compute prediction
 int state_length; // number of binary input variables

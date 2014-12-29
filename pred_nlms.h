@@ -14,10 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-int maze_init(char *filename);
-void maze_free();
-void maze_rand_pos();
-char *maze_state();
-double maze_execute(int move);
-_Bool maze_isreset();
-double *maze_dstate();
+
+#ifdef NLMS_PREDICTION
+
+typedef struct PRED {
+	int weights_length;
+	double *weights;
+	double pre;
+} PRED;
+
+#endif
