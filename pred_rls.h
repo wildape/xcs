@@ -15,9 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef CONSTANT_PREDICTION
+#ifdef RLS_PREDICTION
 
 typedef struct PRED {
+	int weights_length;
+	double *weights;
+	double *matrix;
 	double pre;
 } PRED;
 

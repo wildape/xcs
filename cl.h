@@ -17,6 +17,7 @@
 
 #include "cond_ternary.h"
 #include "act_integer.h"
+#include "pred_rls.h"
 #include "pred_nlms.h"
 #include "pred_constant.h"
 

@@ -20,8 +20,7 @@
  * The original XCS constant prediction module.
  */
 
-//#ifdef CONSTANT_PREDICTION
-#ifndef NLMS_PREDICTION
+#ifdef CONSTANT_PREDICTION
 
 #include <stdio.h>
 #include <stdlib.h>
