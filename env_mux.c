@@ -57,6 +57,15 @@ void mux_init(int bits)
 	pos_bits--;
 }
 
+void mux_free()
+{
+	free(state);
+#ifdef XCSF
+	free(dstate);
+#endif
+
+}
+
 char *mux_state()
 {
 	for (int i = 0; i < state_length; i++) {

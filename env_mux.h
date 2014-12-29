@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 void mux_init(int bits);
+void mux_free();
 double mux_execute(int act);
 char *mux_state();
 #ifdef XCSF

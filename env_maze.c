@@ -115,6 +115,14 @@ int maze_init(char *filename)
 	return EXIT_SUCCESS;
 }
 
+void maze_free()
+{
+	free(state);
+#ifdef XCSF
+	free(dstate);
+#endif
+}
+
 void maze_rand_pos()
 {
 	reset = false;

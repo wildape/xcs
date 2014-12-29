@@ -59,6 +59,18 @@ void env_init(char **argv)
 	}
 }
 
+void env_free()
+{
+	switch(env) {
+		case MUX:
+			mux_free();
+			break;
+		case MAZE:
+			maze_free();
+			break;
+	}
+}
+
 void env_reset()
 {
 	switch(env) {

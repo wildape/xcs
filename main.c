@@ -59,5 +59,6 @@ int main(int argc, char *argv[0])
 		set_kill(&pset);
 		outfile_close();
 	}
+	env_free();
 	return EXIT_SUCCESS;
 }
