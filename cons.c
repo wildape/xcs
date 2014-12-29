@@ -59,6 +59,10 @@ void constants_init(int argc, char **argv)
 {
 	init_config("cons.txt");
 	POP_SIZE = atoi(getvalue("POP_SIZE"));
+	if(strcmp(getvalue("POP_INIT"), "false") == 0)
+		POP_INIT = false;
+	else
+		POP_INIT = true;
 	NUM_EXPERIMENTS = atoi(getvalue("NUM_EXPERIMENTS"));
 	MAX_TRIALS = atoi(getvalue("MAX_TRIALS"));
 	P_CROSSOVER = atof(getvalue("P_CROSSOVER"));

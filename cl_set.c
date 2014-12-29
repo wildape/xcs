@@ -41,8 +41,18 @@ void pop_init()
 	pset = NULL; // population linked list
 	pop_num = 0; // num macro-classifiers
 	pop_num_sum = 0; // numerosity sum
+
+	if(POP_INIT) {
+		while(pop_num < POP_SIZE) {
+			CL *new = malloc(sizeof(CL));
+			cl_init(new, POP_SIZE, 0);
+			cond_rand(new);
+			act_rand(new);
+			pop_add(new);
+		}
+	}
 }
- 
+
 void set_match(NODE **mset, char *state, int time, NODE **kset)
 {
 	int m_num = 0;
@@ -86,7 +96,7 @@ void set_match(NODE **mset, char *state, int time, NODE **kset)
 			}
 			if(del->cl->num == 0) {
 				set_add(kset, del->cl);
-			    free(del);
+				free(del);
 			}
 		}
 	} while(again);
@@ -297,7 +307,7 @@ void set_times(NODE **set, int time)
 	for(NODE *iter = *set; iter != NULL; iter = iter->next)
 		iter->cl->time = time;
 }
-        
+
 double set_total_fit(NODE **set)
 {
 	double sum = 0.0;
