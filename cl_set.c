@@ -290,14 +290,13 @@ void set_validate(NODE **set, int *size, int *num)
 				free(iter);
 				iter = prev->next;
 			}
-			continue;
 		}
 		else {
 			(*size)++;
 			(*num) += iter->cl->num;
+			prev = iter;
+			iter = iter->next;
 		}
-		prev = iter;
-		iter = iter->next;
 	}
 }
 
