@@ -280,11 +280,16 @@ void set_validate(NODE **set, int *size, int *num)
 	NODE *iter = *set;
 	while(iter != NULL) {
 		if(iter->cl == NULL || iter->cl->num == 0) {
-			if(prev == NULL)
+			if(prev == NULL) {
 				*set = iter->next;
-			else
+				free(iter);
+				iter = *set;
+			}
+			else {
 				prev->next = iter->next;
-			iter = iter->next;
+				free(iter);
+				iter = prev->next;
+			}
 			continue;
 		}
 		else {
