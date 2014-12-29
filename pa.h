@@ -16,11 +16,13 @@
  */
 
 #ifdef XCSF
-void pa_init(NODE **set, double *state);
+void pa_build(NODE **set, double *state);
 #else
-void pa_init(NODE **set);
+void pa_build(NODE **set);
 #endif
 double pa_best_val();
 double pa_val(int act);   
 int pa_best_action();
 int pa_rand_action();
+void pa_init();
+void pa_free();

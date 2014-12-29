@@ -39,6 +39,7 @@ void exploit_multi(int *perf, double *err, int trial, int step);
 
 void multi_step_exp(int *perf, double *err)
 {
+	pa_init();
 	int expl = 0;
 	int expl_step = 0;
 	for(int expl_trial = 0; expl_trial < MAX_TRIALS; expl_trial += expl) {
@@ -51,6 +52,7 @@ void multi_step_exp(int *perf, double *err)
 		if(expl_trial%PERF_AVG_TRIALS == 0 && expl == 0 && expl_trial > 0)
 			disp_perf(perf, err, expl_trial);
 	}
+	pa_free();
 }
 
 int explore_multi(int step)
@@ -75,9 +77,9 @@ int explore_multi(int step)
 		set_match(&mset, state, step+steps, &kset);
 		// select a random move
 #ifdef XCSF
-		pa_init(&mset, dstate);
+		pa_build(&mset, dstate);
 #else
-		pa_init(&mset);
+		pa_build(&mset);
 #endif
 		int action = pa_rand_action();
 		// generate action set
@@ -147,9 +149,9 @@ void exploit_multi(int *perf, double *err, int trial, int step)
 		set_match(&mset, state, step, &kset);
 		// select the best move
 #ifdef XCSF
-		pa_init(&mset, dstate);
+		pa_build(&mset, dstate);
 #else
-		pa_init(&mset);
+		pa_build(&mset);
 #endif
 		int action = pa_best_action();
 		// generate action set

@@ -33,16 +33,18 @@
 double *pa;
 double *nr; 
 
+void pa_init()
+{
+	pa = malloc(sizeof(double)*num_actions);
+	nr = malloc(sizeof(double)*num_actions);
+}
+
 #ifdef XCSF
-void pa_init(NODE **set, double *state)
+void pa_build(NODE **set, double *state)
 #else
-void pa_init(NODE **set)
+void pa_build(NODE **set)
 #endif
 {
-	if(pa == NULL) {
-		pa = malloc(sizeof(double)*num_actions);
-		nr = malloc(sizeof(double)*num_actions);
-	}
 	for(int i = 0; i < num_actions; i++) {
 		pa[i] = 0.0;
 		nr[i] = 0.0;
@@ -98,4 +100,10 @@ double pa_val(int act)
 	if(act >= 0 && act < num_actions)
 		return pa[act];
 	return -1.0;
+}
+
+void pa_free()
+{
+	free(pa);
+	free(nr);
 }

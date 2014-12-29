@@ -39,6 +39,7 @@ void exploit_single(int time, int *correct, double *error);
 
 void single_step_exp(int *perf, double *err)
 {
+	pa_init();
 	int expl = 0;
 	for(int expl_p = 0; expl_p < MAX_TRIALS; expl_p += expl) {
 		expl = (expl+1)%2;
@@ -49,6 +50,7 @@ void single_step_exp(int *perf, double *err)
 		if(expl_p%PERF_AVG_TRIALS == 0 && expl == 0 && expl_p > 0)
 			disp_perf(perf, err, expl_p);
 	}
+	pa_free();
 }
  
 void explore_single(int time)
@@ -58,9 +60,9 @@ void explore_single(int time)
 	set_match(&mset, state, time, &kset);
 #ifdef XCSF
 	double *dstate = env_get_dstate();
-	pa_init(&mset, dstate);
+	pa_build(&mset, dstate);
 #else
-	pa_init(&mset);
+	pa_build(&mset);
 #endif
 	int action = pa_rand_action();
 	NODE *aset = NULL; int anum = 0;
@@ -84,9 +86,9 @@ void exploit_single(int time, int *correct, double *error)
 	set_match(&mset, state, time, &kset);
 #ifdef XCSF
 	double *dstate = env_get_dstate();
-	pa_init(&mset, dstate);
+	pa_build(&mset, dstate);
 #else
-	pa_init(&mset);
+	pa_build(&mset);
 #endif
 	int action = pa_best_action();
 	NODE *aset = NULL; int anum = 0;
