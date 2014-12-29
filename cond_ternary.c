@@ -35,50 +35,53 @@
 #include "random.h"
 #include "cl.h"
 
-void cond_init(CL *c)
+void cond_init(COND *cond)
 {
-	c->con = malloc(sizeof(char)*state_length);
+	cond->string = malloc(sizeof(char)*state_length);
 }
 
-void cond_copy(CL *to, CL *from)
+void cond_copy(COND *to, COND *from)
 {
-	memcpy(to->con, from->con, sizeof(char)*state_length);
+	memcpy(to->string, from->string, sizeof(char)*state_length);
 }                              
  
-_Bool cond_match(CL *c, char *state)
+_Bool cond_match(COND *cond, char *state)
 {
 	for(int i = 0; i < state_length; i++) {
-		if(c->con[i] != DONT_CARE && c->con[i] != state[i])
+		if(cond->string[i] != DONT_CARE && cond->string[i] != state[i]) {
+			cond->m = false;
 			return false;
+		}
 	}
+	cond->m = true;
 	return true;
 }
  
-void cond_rand(CL *c)
+void cond_rand(COND *cond)
 {
 	for(int i = 0; i < state_length; i++) {
 		if(drand() < P_DONTCARE) 
-			c->con[i] = DONT_CARE;
+			cond->string[i] = DONT_CARE;
 		else {
 			if(drand() < 0.5)
-				c->con[i] = '0';
+				cond->string[i] = '0';
 			else
-				c->con[i] = '1';
+				cond->string[i] = '1';
 		}
 	}
 }
 
-void cond_cover(CL *c, char *state)
+void cond_cover(COND *cond, char *state)
 {
 	for(int i = 0; i < state_length; i++) {
 		if(drand() < P_DONTCARE)
-			c->con[i] = DONT_CARE;
+			cond->string[i] = DONT_CARE;
 		else
-			c->con[i] = state[i];
+			cond->string[i] = state[i];
 	}
 }
                
-_Bool cond_crossover(CL *c1, CL *c2) 
+_Bool cond_crossover(COND *cond1, COND *cond2) 
 {
 	// two point crossover
 	_Bool changed = false;
@@ -93,70 +96,70 @@ _Bool cond_crossover(CL *c1, CL *c2)
 		else if(p1 == p2) {
 			p2++;
 		}
-		char cond1[state_length];
-		char cond2[state_length];
-		strncpy(cond1, c1->con, state_length);
-		strncpy(cond2, c2->con, state_length);
+		char cc1[state_length];
+		char cc2[state_length];
+		strncpy(cc1, cond1->string, state_length);
+		strncpy(cc2, cond2->string, state_length);
 		for(int i = p1; i < p2; i++) { 
-			if(cond1[i] != cond2[i]) {
+			if(cc1[i] != cc2[i]) {
 				changed = true;
-				char help = c1->con[i];
-				c1->con[i] = cond2[i];
-				c2->con[i] = help;
+				char help = cond1->string[i];
+				cond1->string[i] = cc2[i];
+				cond2->string[i] = help;
 			}
 		}
 		if(changed) {
-			strncpy(c1->con, cond1, state_length);
-			strncpy(c2->con, cond2, state_length);
+			strncpy(cond1->string, cc1, state_length);
+			strncpy(cond2->string, cc2, state_length);
 		}
 	}
 	return changed;
 }
                     
-_Bool cond_mutate(CL *c, char *state)
+_Bool cond_mutate(COND *cond, char *state)
 {
 	_Bool mod = false;
 	for(int i = 0; i < state_length; i++) {
 		if(drand() < P_MUTATION) {
-			if(c->con[i] == DONT_CARE)
-				c->con[i] = state[i];
+			if(cond->string[i] == DONT_CARE)
+				cond->string[i] = state[i];
 			else
-				c->con[i] = DONT_CARE;
+				cond->string[i] = DONT_CARE;
 			mod = true;
 		}
 	}
 	return mod;
 }
 
-_Bool cond_general(CL *c1, CL *c2)
+_Bool cond_general(COND *cond1, COND *cond2)
 {
-	// returns true if c1 is more general than c2
+	// returns true if cond1 is more general than cond2
 	_Bool gen = false;
 	for(int i = 0; i < state_length; i++) {
-		if(c1->con[i] != DONT_CARE && c1->con[i] != c2->con[i])
+		if(cond1->string[i] != DONT_CARE && cond1->string[i] != cond2->string[i])
 			return false;
-		else if(c1->con[i] != c2->con[i])
+		else if(cond1->string[i] != cond2->string[i])
 			gen = true;
 	}
 	return gen;
 }
  
-_Bool cond_duplicate(CL *c1, CL *c2)
+_Bool cond_duplicate(COND *cond1, COND *cond2)
 {
 	for(int i = 0; i < state_length; i++) {
-		if(c1->con[i] != c2->con[i])
+		if(cond1->string[i] != cond2->string[i])
 			return false;
 	}
 	return false;
 }
 
-void cond_free(CL *c)
+void cond_free(COND *cond)
 {
-	free(c->con);
+	free(cond->string);
 }
  
-void cond_print(CL *c)
+void cond_print(COND *cond)
 {
 	for(int i = 0; i < state_length; i++)
-		printf("%c", c->con[i]);
+		printf("%c", cond->string[i]);
 }

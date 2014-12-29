@@ -46,7 +46,7 @@ void pop_init()
 		while(pop_num < POP_SIZE) {
 			CL *new = malloc(sizeof(CL));
 			cl_init(new, POP_SIZE, 0);
-			cond_rand(new);
+			cond_rand(&new->cond);
 			act_rand(new);
 			pop_add(new);
 		}
@@ -62,7 +62,7 @@ void set_match(NODE **mset, char *state, int time, NODE **kset)
 		act_covered[i] = false;
 	// find matching classifiers in the population
 	for(NODE *iter = pset; iter != NULL; iter = iter->next) {
-		if(cond_match(iter->cl, state)) {
+		if(cond_match(&iter->cl->cond, state)) {
 			set_add(mset, iter->cl);
 			act_covered[iter->cl->act] = true;
 			m_num += iter->cl->num;
@@ -87,7 +87,7 @@ void set_match(NODE **mset, char *state, int time, NODE **kset)
 		// enforce population size limit
 		while(pop_num_sum > POP_SIZE) {
 			NODE * del = pop_del();
-			if(cond_match(del->cl, state)) {
+			if(cond_match(&del->cl->cond, state)) {
 				set_validate(mset, &m_size, &m_num);
 				if(!set_action_covered(mset, del->cl->act)) { 
 					act_covered[del->cl->act] = false;
@@ -250,7 +250,7 @@ void set_subsumption(NODE **set, int *size, int *num, NODE **kset)
 	for(iter = *set; iter != NULL; iter = iter->next) {
 		CL *c = iter->cl;
 		if(cl_subsumer(c)) {
-			if(s == NULL || cond_general(c, s))
+			if(s == NULL || cond_general(&c->cond, &s->cond))
 				s = c;
 		}
 	}
@@ -260,7 +260,7 @@ void set_subsumption(NODE **set, int *size, int *num, NODE **kset)
 		while(iter != NULL) {
 			CL *c = iter->cl;
 			iter = iter->next;
-			if(cond_general(s, c)) {
+			if(cond_general(&s->cond, &c->cond)) {
 				s->num += c->num;
 				c->num = 0;
 				set_add(kset, c);

@@ -14,9 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "cond_ternary.h"
+
 typedef struct CL
 {
-	char *con;
+	COND cond;
 	int act;
 	double err;
 	double fit;
@@ -49,17 +52,17 @@ void cl_print(CL *c);
 void cl_update_fit(CL *c, double acc_sum, double acc);
 
 // classifier condition 
-_Bool cond_crossover(CL *c1, CL *c2);
-_Bool cond_duplicate(CL *c1, CL *c2);
-_Bool cond_general(CL *c1, CL *c2);
-_Bool cond_mutate(CL *c, char *state);
-_Bool cond_match(CL *c, char *state);
-void cond_copy(CL *to, CL *from);
-void cond_free(CL *c);
-void cond_init(CL *c);
-void cond_cover(CL *c, char *mcon);
-void cond_print(CL *c);
-void cond_rand(CL *c);
+_Bool cond_crossover(COND *cond1, COND *cond2);
+_Bool cond_duplicate(COND *cond1, COND *cond2);
+_Bool cond_general(COND *cond1, COND *cond2);
+_Bool cond_mutate(COND *cond, char *state);
+_Bool cond_match(COND *cond, char *state);
+void cond_copy(COND *to, COND *from);
+void cond_free(COND *cond);
+void cond_init(COND *cond);
+void cond_cover(COND *cond, char *mcon);
+void cond_print(COND *cond);
+void cond_rand(COND *cond);
 
 // classifier action
 _Bool act_duplicate(CL *c1, CL *c2);

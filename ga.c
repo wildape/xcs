@@ -141,7 +141,7 @@ _Bool ga_mutate(CL *c, char *state)
 	sam_adapt(c);
 	P_MUTATION = c->mu[0];
 #endif
-	_Bool mod = cond_mutate(c, state);
+	_Bool mod = cond_mutate(&c->cond, state);
 	if(act_mutate(c))
 		mod = true;
 	return mod;
@@ -149,5 +149,5 @@ _Bool ga_mutate(CL *c, char *state)
 
 void ga_crossover(CL *c1, CL *c2)
 {
-	cond_crossover(c1, c2);
+	cond_crossover(&c1->cond, &c2->cond);
 }
