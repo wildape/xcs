@@ -35,7 +35,7 @@
 _Bool set_action_covered(NODE **set, int action);
 void set_subsumption(NODE **set, int *size, int *num, NODE **kset);
 void set_update_fit(NODE **set, int size, int num_sum);
- 
+
 void pop_init()
 {
 	pset = NULL; // population linked list
@@ -55,11 +55,13 @@ void pop_init()
 
 void set_match(NODE **mset, char *state, int time, NODE **kset)
 {
+	// builds the match set
 	int m_num = 0;
 	int m_size = 0;
 	_Bool act_covered[num_actions];
-	for(int i = 0; i< num_actions; i++)
+	for(int i = 0; i < num_actions; i++)
 		act_covered[i] = false;
+
 	// find matching classifiers in the population
 	for(NODE *iter = pset; iter != NULL; iter = iter->next) {
 		if(cond_match(&iter->cl->cond, state)) {
@@ -69,6 +71,7 @@ void set_match(NODE **mset, char *state, int time, NODE **kset)
 			m_size++;
 		}
 	}   
+
 	// perform covering if all actions are not represented
 	_Bool again;
 	do {
@@ -81,22 +84,28 @@ void set_match(NODE **mset, char *state, int time, NODE **kset)
 				cl_cover(new, state, i);
 				pop_add(new);
 				set_add(mset, new);
-				act_covered[i]++; 
+				m_size++;
+				m_num++;
+				act_covered[i] = true;
 			}
 		}
-		// enforce population size limit
-		while(pop_num_sum > POP_SIZE) {
-			NODE * del = pop_del();
-			if(cond_match(&del->cl->cond, state)) {
-				set_validate(mset, &m_size, &m_num);
-				if(!set_action_covered(mset, del->cl->act.a)) { 
-					act_covered[del->cl->act.a] = false;
-					again = true;
-				}     
-			}
-			if(del->cl->num == 0) {
-				set_add(kset, del->cl);
-				free(del);
+
+		// enforce pop size
+		int prev_psize = pop_num;
+		pop_enforce_limit(kset);
+		// if a macro classifier was deleted, validate the match set
+		if(prev_psize > pop_num) {
+			int prev_msize = m_size;
+			set_validate(mset, &m_size, &m_num);
+			// if the deleted classifier was in the match set,
+			// check if an action is now not covered
+			if(prev_msize > m_size) {
+				for(int i = 0; i < num_actions; i++) {
+					if(!set_action_covered(mset, i)) {
+						act_covered[i] = false;
+						again = true;
+					}
+				}
 			}
 		}
 	} while(again);
@@ -104,6 +113,7 @@ void set_match(NODE **mset, char *state, int time, NODE **kset)
 
 _Bool set_action_covered(NODE **set, int action)
 {
+	// check whether an action is represented in the set
 	for(NODE *iter = *set; iter != NULL; iter = iter->next) {
 		if(iter->cl->act.a == action)
 			return true;
@@ -113,6 +123,7 @@ _Bool set_action_covered(NODE **set, int action)
 
 int set_action(NODE **mset, NODE **aset, int action, int *num)
 {
+	// builds the action set
 	int size = 0;
 	for(NODE *iter = *mset; iter != NULL; iter = iter->next) {
 		if(iter->cl->act.a == action) {
@@ -126,6 +137,7 @@ int set_action(NODE **mset, NODE **aset, int action, int *num)
 
 void set_add(NODE **set, CL *c)
 {
+	// add a classifier to a set
 	if(*set == NULL) {
 		*set = malloc(sizeof(NODE));
 		(*set)->cl = c;
@@ -168,17 +180,15 @@ void pop_add(CL *c)
 	}
 }
 
-NODE *pop_del()
+void pop_del(NODE **kset)
 {
-	NODE *iter;
+	double avg_fit = set_total_fit(&pset) / pop_num_sum; double sum = 0.0;
+	for(NODE *iter = pset; iter != NULL; iter = iter->next) sum +=
+		cl_del_vote(iter->cl, avg_fit); double p = drand() * sum;
+
 	NODE *prev = NULL;
-	double avg_fit = set_total_fit(&pset) / pop_num_sum;
-	double sum = 0.0;
-	for(iter = pset; iter != NULL; iter = iter->next)
-		sum += cl_del_vote(iter->cl, avg_fit);
-	double p = drand() * sum;
 	sum = 0.0;
-	for(iter=pset; iter != NULL; prev=iter, iter=iter->next) {
+	for(NODE *iter = pset; iter != NULL; iter = iter->next) {
 		sum += cl_del_vote(iter->cl, avg_fit);
 		if(sum > p) {
 			iter->cl->num--;
@@ -190,11 +200,19 @@ NODE *pop_del()
 					pset = iter->next;
 				else
 					prev->next = iter->next;
+				set_add(kset, iter->cl);
+				free(iter);
 			}
-			return iter;
+			return;
 		}
+		prev = iter;
 	}   
-	return iter;
+}
+
+void pop_enforce_limit(NODE **kset)
+{
+	while(pop_num_sum > POP_SIZE)
+		pop_del(kset);
 }
 
 void set_update(NODE **set, int *size, int *num, 
@@ -345,20 +363,27 @@ void set_kill(NODE **set)
 
 void set_clean(NODE **kset, NODE **set, _Bool in_set)
 {
-	// if in_set = false, removes classifiers from kset
-	// that are *not* in the set; otherwise removes only
-	// classifiers from kset that *are* in the set
-	NODE *iter, *kiter, *prev_kiter = NULL;
-	for(iter = *set; iter != NULL; iter = iter->next) {
-		for(kiter = *kset; kiter != NULL; kiter = kiter->next) {
+	for(NODE *iter = *set; iter != NULL; iter = iter->next) {
+		NODE *kiter = *kset;
+		NODE *prev_kiter = NULL;
+		while(kiter != NULL) {
 			if((!in_set && iter->cl != kiter->cl) ||
-					(in_set && iter->cl == kiter->cl)) {
-				if(prev_kiter == NULL)
+					(in_set && iter->cl == kiter->cl) ) {
+				if(prev_kiter == NULL) {
 					*kset = kiter->next;
-				else
+					cl_free(kiter->cl);
+					free(kiter);
+					kiter = *kset;
+				}
+				else {
 					prev_kiter->next = kiter->next;
-				cl_free(kiter->cl);
-				free(kiter);
+					cl_free(kiter->cl);
+					free(kiter);
+					kiter = prev_kiter->next;
+				}
+			}
+			else {
+				kiter = kiter->next;
 			}
 		}
 	}

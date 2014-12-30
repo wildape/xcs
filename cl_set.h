@@ -23,7 +23,8 @@ typedef struct NODE
  
 void pop_init();
 void pop_add(CL *c);
-NODE *pop_del();
+void pop_del(NODE **kset);
+void pop_enforce_limit(NODE **kset);
 double set_mean_time(NODE **set, int num_sum);
 double set_total_fit(NODE **set);
 double set_total_time(NODE **set);
