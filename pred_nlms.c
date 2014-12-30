@@ -52,7 +52,8 @@ void pred_init(PRED *pred)
 
 void pred_copy(PRED *to, PRED *from)
 {
-	memcpy(to->weights, from->weights, sizeof(double)*from->weights_length);
+	(void)to;
+	(void)from;
 }
 
 void pred_free(PRED *pred)
