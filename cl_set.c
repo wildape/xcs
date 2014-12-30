@@ -361,34 +361,6 @@ void set_kill(NODE **set)
 	}
 }
 
-void set_clean(NODE **kset, NODE **set, _Bool in_set)
-{
-	for(NODE *iter = *set; iter != NULL; iter = iter->next) {
-		NODE *kiter = *kset;
-		NODE *prev_kiter = NULL;
-		while(kiter != NULL) {
-			if((!in_set && iter->cl != kiter->cl) ||
-					(in_set && iter->cl == kiter->cl) ) {
-				if(prev_kiter == NULL) {
-					*kset = kiter->next;
-					cl_free(kiter->cl);
-					free(kiter);
-					kiter = *kset;
-				}
-				else {
-					prev_kiter->next = kiter->next;
-					cl_free(kiter->cl);
-					free(kiter);
-					kiter = prev_kiter->next;
-				}
-			}
-			else {
-				kiter = kiter->next;
-			}
-		}
-	}
-}
-
 #ifdef SELF_ADAPT_MUTATION
 double set_avg_mut(NODE **set, int m)
 {

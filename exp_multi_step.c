@@ -97,13 +97,12 @@ int explore_multi(int step)
 		set_free(&mset);
 		set_free(&prev_aset);
 		prev_aset = aset;
-		set_clean(&kset, &prev_aset, false);
 		prev_reward = reward;
 		strncpy(prev_state, state, state_length);
 		memcpy(prev_dstate, dstate, sizeof(double)*dstate_length);
 	}
-	set_clean(&kset, &prev_aset, true);
 	set_free(&prev_aset);
+	set_kill(&kset);
 	return step+steps;
 }
 
@@ -152,14 +151,13 @@ void exploit_multi(int *perf, double *err, int trial, int step)
 		set_free(&mset);
 		set_free(&prev_aset);
 		prev_aset = aset;
-		set_clean(&kset, &prev_aset, false);
 		prev_reward = reward;
 		strncpy(prev_state, state, state_length);
 		memcpy(prev_dstate, dstate, sizeof(double)*dstate_length);
 		prev_pred = pa_val(action);
 	}
-	set_clean(&kset, &prev_aset, true);
 	set_free(&prev_aset);
+	set_kill(&kset);
 	perf[trial%PERF_AVG_TRIALS] = steps;
 	err[trial%PERF_AVG_TRIALS] /= steps;
 }

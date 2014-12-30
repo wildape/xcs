@@ -30,7 +30,6 @@ double set_total_fit(NODE **set);
 double set_total_time(NODE **set);
 int set_action(NODE **mset, NODE **aset, int action, int *num);
 void set_add(NODE **set, CL *c);
-void set_clean(NODE **kset, NODE **set, _Bool in_set);
 void set_free(NODE **set);
 void set_kill(NODE **set);
 void set_match(NODE **mset, char *state, int time, NODE **kset);
