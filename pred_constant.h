@@ -19,6 +19,7 @@
 
 typedef struct PRED {
 	double pre;
+	int exp;
 } PRED;
 
 #endif

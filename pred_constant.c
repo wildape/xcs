@@ -34,15 +34,18 @@
 void pred_init(PRED *pred)
 {
 	pred->pre = INIT_PREDICTION;
+	pred->exp = 0;
 }
     
 void pred_update(PRED *pred, double p, double *state)
 {
-	(void)state; // remove unused parameter warnings
-//	if(c->exp < 1.0/BETA) 
-//		c->pre = (c->pre * (c->exp-1.0) + p) / (double)c->exp;
-//	else
+	pred->exp++;
+	if(pred->exp < 1.0/BETA) 
+		pred->pre = (pred->pre * (pred->exp-1.0) + p) / (double)pred->exp;
+	else
 		pred->pre += BETA * (p - pred->pre);
+
+	(void)state; // remove unused parameter warnings
 }
 
 double pred_compute(PRED *pred, double *state)
