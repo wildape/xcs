@@ -99,6 +99,7 @@ int maze_init(char *filename)
 				break;
 		}
 	}
+	fclose(file);
 	ysize = y;
 	state_length = 8*encoding_bits;
 	state = malloc(sizeof(char)*state_length);
